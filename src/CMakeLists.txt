@@ -1,3 +1,4 @@
 set(gr_src
-  "grid.cpp" "multi_array.cpp")
+  "grid.cpp" "multi_array.cpp" "metrics.cpp" "fields.cpp"
+  "memory.cpp" "Logger.cpp" "timer.cpp")
 add_library(gr STATIC ${gr_src})

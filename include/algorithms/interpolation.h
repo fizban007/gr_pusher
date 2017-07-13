@@ -20,7 +20,7 @@ namespace detail {
 struct interp_nearest_grid_point {
   enum { radius = 1, support = 1 };
 
-  HD_INLINE double operator()(double dx) const {
+  HD_INLINE Scalar operator()(Scalar dx) const {
     return (std::abs(dx) <= 0.5 ? 1.0 : 0.0);
   }
 };
@@ -28,7 +28,7 @@ struct interp_nearest_grid_point {
 struct interp_cloud_in_cell {
   enum { radius = 1, support = 2 };
 
-  HD_INLINE double operator()(double dx) const {
+  HD_INLINE Scalar operator()(Scalar dx) const {
     return max(1.0 - std::abs(dx), 0.0);
   }
 };
@@ -36,12 +36,12 @@ struct interp_cloud_in_cell {
 struct interp_triangular_shaped_cloud {
   enum { radius = 2, support = 3 };
 
-  HD_INLINE double operator()(double dx) const {
-    double abs_dx = std::abs(dx);
+  HD_INLINE Scalar operator()(Scalar dx) const {
+    Scalar abs_dx = std::abs(dx);
     if (abs_dx < 0.5) {
       return 0.75 - dx * dx;
     } else if (abs_dx < 1.5) {
-      double tmp = 1.5 - abs_dx;
+      Scalar tmp = 1.5 - abs_dx;
       return 0.5 * tmp * tmp;
     } else {
       return 0.0;
@@ -52,13 +52,13 @@ struct interp_triangular_shaped_cloud {
 struct interp_piecewise_cubic {
   enum { radius = 2, support = 4 };
 
-  HD_INLINE double operator()(double dx) const {
-    double abs_dx = std::abs(dx);
+  HD_INLINE Scalar operator()(Scalar dx) const {
+    Scalar abs_dx = std::abs(dx);
     if (abs_dx < 1.0) {
-      double tmp = abs_dx * abs_dx;
+      Scalar tmp = abs_dx * abs_dx;
       return 2.0 / 3.0 - tmp + 0.5 * tmp * abs_dx;
     } else if (abs_dx < 2.0) {
-      double tmp = 2.0 - abs_dx;
+      Scalar tmp = 2.0 - abs_dx;
       return 1.0 / 6.0 * tmp * tmp * tmp;
     } else {
       return 0.0;
@@ -74,10 +74,10 @@ class Interpolator {
   HOST_DEVICE ~Interpolator() {}
 
   template <typename FloatT>
-  HD_INLINE double interp_cell(FloatT pos, int p_cell, int target_cell,
+  HD_INLINE Scalar interp_cell(FloatT pos, int p_cell, int target_cell,
                                int stagger = 0) const {
     FloatT x =
-        (double)target_cell + (stagger == 0 ? 0.5 : 1.0) - pos - (double)p_cell;
+        (Scalar)target_cell + (stagger == 0 ? 0.5 : 1.0) - pos - (Scalar)p_cell;
     switch (m_order) {
       case 0:
         return m_interp_0(x);
