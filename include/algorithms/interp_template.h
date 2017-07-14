@@ -9,7 +9,7 @@ template <typename Double>
 Double
 interp(const Double& dx) {
   // return max(1.0 - sqrt(sqr(dx)), 0.0);
-  if (dx < 1.0 && dx > 0.0) return 1.0 - dx;
+  if (dx < 1.0 && dx >= 0.0) return 1.0 - dx;
   else if (dx > -1.0 && dx < 0.0) return 1.0 + dx;
   else return 0.0;
 }
