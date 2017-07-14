@@ -587,30 +587,30 @@ Grid::make_dual_f::operator()(const Metric& g, bool inverse) const {
 //   return metric_matrix<InterpolationOrder>(cell, rel_pos);
 // }
 
-template <typename POS_T>
-Scalar
-Grid::alpha(int cell, const Vec3<POS_T>& rel_pos) const {
-  Interpolator interp(1);
-  // Original metric array has stagger same as vector component n
-  Scalar result = 0.0;
+// template <typename POS_T>
+// Scalar
+// Grid::alpha(int cell, const Vec3<POS_T>& rel_pos) const {
+//   Interpolator interp(1);
+//   // Original metric array has stagger same as vector component n
+//   Scalar result = 0.0;
 
-  Vec3<int> c = m_mesh.get_cell_3d(cell);
-  Vec3<int> lower = c - interp.radius();
-  Vec3<int> upper = c + interp.support() - interp.radius();
-  if (dim() < 3) {
-    lower[2] = upper[2] = c[2];
-  }
-  for (int k = lower[2]; k <= upper[2]; k++) {
-    for (int j = lower[1]; j <= upper[1]; j++) {
-      for (int i = lower[0]; i <= upper[0]; i++) {
-        result += m_alpha[0](i, j, k) * interp.interp_cell(rel_pos[0], c[0], i, 1)
-                  * interp.interp_cell(rel_pos[1], c[1], j, 0)
-                  * (dim() < 3 ? 1.0 : interp.interp_cell(rel_pos[2], c[2], k, 0));
-      }
-    }
-  }
-  return result;
-}
+//   Vec3<int> c = m_mesh.get_cell_3d(cell);
+//   Vec3<int> lower = c - interp.radius();
+//   Vec3<int> upper = c + interp.support() - interp.radius();
+//   if (dim() < 3) {
+//     lower[2] = upper[2] = c[2];
+//   }
+//   for (int k = lower[2]; k <= upper[2]; k++) {
+//     for (int j = lower[1]; j <= upper[1]; j++) {
+//       for (int i = lower[0]; i <= upper[0]; i++) {
+//         result += m_alpha[0](i, j, k) * interp.interp_cell(rel_pos[0], c[0], i, 1)
+//                   * interp.interp_cell(rel_pos[1], c[1], j, 0)
+//                   * (dim() < 3 ? 1.0 : interp.interp_cell(rel_pos[2], c[2], k, 0));
+//       }
+//     }
+//   }
+//   return result;
+// }
 
 template <typename POS_T>
 Scalar
@@ -773,7 +773,7 @@ Grid::alpha(int cell, const Double& x1, const Double& x2, const Double& x3) cons
   Double result = 0.0;
 
   Vec3<int> c = m_mesh.get_cell_3d(cell);
-  Vec3<int> lower = c - Vec3<int>(2, 2, 2);
+  Vec3<int> lower = c - Vec3<int>(1, 1, 1);
   Vec3<int> upper = c + Vec3<int>(1, 1, 1);
   if (dim() < 3) {
     lower[2] = upper[2] = c[2];
@@ -781,6 +781,9 @@ Grid::alpha(int cell, const Double& x1, const Double& x2, const Double& x3) cons
   for (int k = lower[2]; k <= upper[2]; k++) {
     for (int j = lower[1]; j <= upper[1]; j++) {
       for (int i = lower[0]; i <= upper[0]; i++) {
+        // std::cout << i << ", " << c[0] << ", " << interp_cell(x1, i - c[0], m_mesh.delta[0], 1).x() << std::endl;
+        // std::cout << j << ", " << c[1] << ", " << interp_cell(x2, j - c[1], m_mesh.delta[1], 0).x() << std::endl;
+        // std::cout << k << ", " << c[2] << ", " << (dim() < 3 ? 1.0 : interp_cell(x3, k - c[2], m_mesh.delta[2], 0).x()) << std::endl;
         result += m_alpha[0](i, j, k) * interp_cell(x1, i - c[0], m_mesh.delta[0], 1)
                   * interp_cell(x2, j - c[1], m_mesh.delta[1], 0)
                   * (dim() < 3 ? 1.0 : interp_cell(x3, k - c[2], m_mesh.delta[2], 0));
@@ -796,7 +799,7 @@ Grid::beta(int n, int cell, const Double& x1, const Double& x2, const Double& x3
   Double result = 0.0;
 
   Vec3<int> c = m_mesh.get_cell_3d(cell);
-  Vec3<int> lower = c - Vec3<int>(2, 2, 2);
+  Vec3<int> lower = c - Vec3<int>(1, 1, 1);
   Vec3<int> upper = c + Vec3<int>(1, 1, 1);
   if (dim() < 3) {
     lower[2] = upper[2] = c[2];
@@ -845,7 +848,7 @@ Grid::inv_metric(int n, int m, int cell, const Double& x1, const Double& x2, con
   Double result = 0.0;
 
   Vec3<int> c = m_mesh.get_cell_3d(cell);
-  Vec3<int> lower = c - Vec3<int>(2, 2, 2);
+  Vec3<int> lower = c - Vec3<int>(1, 1, 1);
   Vec3<int> upper = c + Vec3<int>(1, 1, 1);
   if (dim() < 3) {
     lower[2] = upper[2] = c[2];
@@ -868,7 +871,7 @@ Grid::connection(int n, int u, int v, int cell, const Double& x1, const Double& 
   Double result = 0.0;
 
   Vec3<int> c = m_mesh.get_cell_3d(cell);
-  Vec3<int> lower = c - Vec3<int>(2, 2, 2);
+  Vec3<int> lower = c - Vec3<int>(1, 1, 1);
   Vec3<int> upper = c + Vec3<int>(1, 1, 1);
   if (dim() < 3) {
     lower[2] = upper[2] = c[2];

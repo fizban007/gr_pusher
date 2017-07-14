@@ -30,6 +30,14 @@ TEST_CASE("log spherical", "[metric]") {
   // TODO: position to and from cartesian
 }
 
+TEST_CASE("spherical", "[metric]") {
+  parse_metric("Spherical");
+  double x1 = 2.0, x2 = 2.0;
+  double r = x1;
+  double t = std::sin(x2);
+  REQUIRE(metric::g_metric_spherical.a(x1, x2) == Approx(1.0));
+}
+
 TEST_CASE("Kerr Schild", "[metric]") {
   parse_metric("Kerr_Schild 1.0 0.9");
   REQUIRE(metric::g_metric_kerr_schild.m_rg == Approx(1.0));

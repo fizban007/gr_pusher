@@ -1,8 +1,9 @@
+#include <iostream>
+#include <Eigen/Dense>
 #include "fadiff.h"
 #include "grid.h"
 #include "metrics.h"
 #include "vec3.h"
-#include <iostream>
 
 using namespace Aperture;
 using namespace fadbad;
@@ -38,6 +39,7 @@ mid_point(const Vec3<Double>& x, const Vec3<double>& x0, int c, int c0,
     }
     c_result = grid.mesh().get_idx(cell[0], cell[1], cell[2]);
   }
+  std::cout << "Mid point is (" << result[0].x() << ", " << result[1].x() << ", " << result[2].x() << ")" << std::endl;
   return result;
 }
 
@@ -48,8 +50,9 @@ Gamma(const Vec3<Double>& x, const Vec3<Double>& u, int cell,
   Double result = 1.0;
   for (int i = 0; i < 3; i++)
     for (int j = 0; j < 3; j++)
-      result += grid.inv_metric(i, j, cell, x[0], x[1], x[2]) * u[i] * u[j];
-  result = sqrt(result) / grid.alpha(cell, x[0], x[1], x[2]);
+      result += grid.inv_metric(i, j, cell, x) * u[i] * u[j];
+  std::cout << "alpha is " << grid.alpha(cell, x).x() << std::endl;
+  result = sqrt(result) / grid.alpha(cell, x);
   return result;
 }
 
@@ -58,19 +61,49 @@ Double
 Fu(int n, const Vec3<double>& u0, const Vec3<double>& x0, int c0,
    const Vec3<Double>& u, const Vec3<Double>& x, int cell, const Grid& grid,
    double dt) {
-  Double result = 0.0;
   int mid_cell = 0;
-  auto mid_x = mid_point(x, x0, cell, c0, mid_cell, grid);
+  Vec3<Double> mid_x = mid_point(x, x0, cell, c0, mid_cell, grid);
   Vec3<Double> mid_u(0.5 * (u[0] + u0[0]), 0.5 * (u[1] + u0[1]),
                      0.5 * (u[2] + u0[2]));
+  Double gamma = Gamma(mid_x, mid_u, mid_cell, grid);
+  std::cout << "Gamma is " << gamma.x() << std::endl;
+  Double u_0 = grid.beta(0, mid_cell, mid_x) * mid_u[0] + grid.beta(1, mid_cell, mid_x) * mid_u[1] + grid.beta(2, mid_cell, mid_x) * mid_u[2] - grid.alpha(mid_cell, mid_x[0], mid_x[1], mid_x[2]) * gamma;
   Double conn = 0.0;
-  for (int i = 0; i < 4; i++) {
-    for (int j = 0; j < 4; j++) {
-      conn += grid.connection(n, i, j, mid_cell, mid_x[0], mid_x[1], mid_x[2]) *
-              mid_u[i] * mid_u[j];
+  for (int i = 1; i < 4; i++) {
+    for (int j = 1; j < 4; j++) {
+      if (grid.conn_mask(n, i, j))
+        conn += grid.connection(n, i, j, mid_cell, mid_x) *
+                mid_u[i - 1] * mid_u[j - 1];
     }
   }
-  return u[n] - u0[n] - 0.5 * dt * conn / Gamma(mid_x, mid_u, mid_cell, grid);
+  for (int i = 0; i < 3; i++) {
+    if (grid.conn_mask(n, i + 1, 0))
+      conn += grid.connection(n, i + 1, 0, mid_cell, mid_x) * mid_u[i] * u_0;
+    if (grid.conn_mask(n, 0, i + 1))
+      conn += grid.connection(n, 0, i + 1, mid_cell, mid_x) * mid_u[i] * u_0;
+  }
+  conn += grid.connection(n, 0, 0, mid_cell, mid_x) * u_0 * u_0;
+  return u[n] - u0[n] - 0.5 * dt * conn / gamma;
+}
+
+template <typename Double>
+Double
+Fx(int n, const Vec3<double>& u0, const Vec3<double>& x0, int c0,
+   const Vec3<Double>& u, const Vec3<Double>& x, int c, const Grid& grid,
+   double dt) {
+  Double result = 0.0;
+  int mid_cell = 0;
+  auto mid_x = mid_point(x, x0, c, c0, mid_cell, grid);
+  Vec3<Double> mid_u(0.5 * (u[0] + u0[0]), 0.5 * (u[1] + u0[1]),
+                     0.5 * (u[2] + u0[2]));
+  auto cell = grid.mesh().get_cell_3d(c);
+  auto cell_0 = grid.mesh().get_cell_3d(c0);
+  for (int j = 0; j < 3; j++) {
+    result -= dt * grid.inv_metric(n, j, mid_cell, mid_x) * mid_u[j];
+  }
+  result /= Gamma(mid_x, mid_u, mid_cell, grid);
+  result += x[n] - x0[n] - (cell_0[n] - cell[n]) * grid.mesh().delta[n] - grid.beta(n, mid_cell, mid_x);
+  return result;
 }
 
 int
@@ -82,7 +115,7 @@ main(int argc, char* argv[]) {
   // The convention for grid parsing is as follows:
   // Number of cells, Starting coordinate, Total length, Number of guard cells
   Grid grid(
-      {"DIM1 256 1.0 5.00 1", "DIM2 256 0.0 3.14 1", "DIM3 1   0.0 0.01 0"});
+      {"DIM1 256 1.0 5.00 1", "DIM2 256 0.0 3.14 1", "DIM3 256 0.0 6.28 1"});
   auto m = metric::metric_spherical();
 
   // This line will cache all the necessary quantities on the grid, and save
@@ -94,12 +127,67 @@ main(int argc, char* argv[]) {
   ///  Initialize particle initial condition.
   ////////////////////////////////////////////////////////////////////////////////
   Particle p;
-  p.cell = 128 + 129 * 258;
+  p.cell = 128 + 129 * 258 + 24 * 258 * 258;
   p.u[1] = -1.0;
+  std::cout << "Initially, " << p.x << " " << p.u << " " << p.cell << std::endl;
 
   ////////////////////////////////////////////////////////////////////////////////
   ///  Set up iteration
   ////////////////////////////////////////////////////////////////////////////////
+  const int N = 10;
+  double dt = 0.001;
+  typedef F<double> Var;
+  for (int i = 0; i < N; i++) {
+    // Initialize guess solution
+    Vec3<Var> x(p.x[0], p.x[1], p.x[2]);
+    Vec3<Var> u(p.u[0], p.u[1], p.u[2]);
+    x[0].diff(0, 6);
+    x[1].diff(1, 6);
+    x[2].diff(2, 6);
+    u[0].diff(3, 6);
+    u[1].diff(4, 6);
+    u[2].diff(5, 6);
+    std::array<Var, 6> f;
+    int c = p.cell;
+    // Compute the residual function
+    f[0] = Fu(0, p.u, p.x, p.cell, u, x, c, grid, dt);
+    f[1] = Fu(1, p.u, p.x, p.cell, u, x, c, grid, dt);
+    f[2] = Fu(2, p.u, p.x, p.cell, u, x, c, grid, dt);
+    f[3] = Fx(0, p.u, p.x, p.cell, u, x, c, grid, dt);
+    f[4] = Fx(1, p.u, p.x, p.cell, u, x, c, grid, dt);
+    f[5] = Fx(2, p.u, p.x, p.cell, u, x, c, grid, dt);
+    // Fill the Jacobi matrix
+    Eigen::MatrixXd J(6, 6);
+    Eigen::VectorXd F(6);
+    for (int m = 0; m < 6; m++) {
+      for (int n = 0; n < 6; n++) {
+        J(n, m) = f[n].d(m);
+      }
+      F(m) = f[m].x();
+    }
+    // std::cout << J << std::endl;
+    // std::cout << F << std::endl;
+    // auto J_inv = J.inverse();
+    auto new_f = J.colPivHouseholderQr().solve(F);
+    p.x[0] -= new_f(0);
+    p.x[1] -= new_f(1);
+    p.x[2] -= new_f(2);
+    p.u[0] -= new_f(3);
+    p.u[1] -= new_f(4);
+    p.u[2] -= new_f(5);
+    auto new_cell = grid.mesh().get_cell_3d(p.cell);
+    for (int j = 0; j < 3; j++) {
+      if (p.x[j] >= grid.mesh().delta[j]) {
+        new_cell[j] += 1;
+        p.x[j] -= grid.mesh().delta[j];
+      } else if (p.x[j] < 0.0) {
+        new_cell[j] -= 1;
+        p.x[j] += grid.mesh().delta[j];
+      }
+    }
+    p.cell = grid.mesh().get_idx(new_cell[0], new_cell[1], new_cell[2]);
+    std::cout << p.x << " " << p.u << " " << p.cell << std::endl;
+  }
 
   return 0;
 }

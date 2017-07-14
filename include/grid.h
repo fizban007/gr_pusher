@@ -72,6 +72,7 @@ class Grid {
   bool metric_mask(int n, int m) const { return m_metric_mask[n][m]; }
   bool beta1_mask(int n) const { return m_beta1_mask[n]; }
   bool beta2_mask(int n) const { return m_beta2_mask[n]; }
+  bool conn_mask(int n, int u, int v) const { return m_connection_mask[n][u][v] == 1; }
 
   Scalar metric(int n, int m, const Vec3<Scalar>& global_pos,
                 int interp = 1) const;
@@ -108,8 +109,8 @@ class Grid {
   Scalar cell_volume(int cell) const;
 
   Scalar alpha(int n, int cell) const { return m_alpha[n][cell]; }
-  template <typename POS_T>
-  Scalar alpha(int cell, const Vec3<POS_T>& rel_pos) const;
+  // template <typename POS_T>
+  // Scalar alpha(int cell, const Vec3<POS_T>& rel_pos) const;
   template <typename POS_T>
   Scalar alpha(const Vec3<POS_T>& pos) const;
 
