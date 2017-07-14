@@ -120,13 +120,21 @@ class Grid {
 
   // These methods are for interpolation and AD
   template <typename Double>
-  Double alpha(int cell, Double x1, Double x2, Double x3) const;
+  Double alpha(int cell, const Double& x1, const Double& x2, const Double& x3) const;
   template <typename Double>
-  Double beta(int n, int cell, Double x1, Double x2, Double x3) const;
+  Double beta(int n, int cell, const Double& x1, const Double& x2, const Double& x3) const;
   template <typename Double>
-  Double inv_metric(int i, int j, int cell, Double x1, Double x2, Double x3) const;
+  Double inv_metric(int i, int j, int cell, const Double& x1, const Double& x2, const Double& x3) const;
   template <typename Double>
-  Double connection(int i, int u, int v, int cell, Double x1, Double x2, Double x3) const;
+  Double connection(int i, int u, int v, int cell, const Double& x1, const Double& x2, const Double& x3) const;
+  template <typename Double>
+  Double alpha(int cell, const Vec3<Double>& x) const;
+  template <typename Double>
+  Double beta(int n, int cell, const Vec3<Double>& x) const;
+  template <typename Double>
+  Double inv_metric(int i, int j, int cell, const Vec3<Double>& x) const;
+  template <typename Double>
+  Double connection(int i, int u, int v, int cell, const Vec3<Double>& x) const;
 
   Scalar det(int n, int cell) const { return m_det[n][cell]; }
   // template <typename Pos_t>

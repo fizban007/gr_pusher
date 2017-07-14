@@ -769,11 +769,11 @@ Grid::alpha(const Vec3<POS_T>& pos) const {
 
 template <typename Double>
 Double
-Grid::alpha(int cell, Double x1, Double x2, Double x3) const {
+Grid::alpha(int cell, const Double& x1, const Double& x2, const Double& x3) const {
   Double result = 0.0;
 
   Vec3<int> c = m_mesh.get_cell_3d(cell);
-  Vec3<int> lower = c - Vec3<int>(1, 1, 1);
+  Vec3<int> lower = c - Vec3<int>(2, 2, 2);
   Vec3<int> upper = c + Vec3<int>(1, 1, 1);
   if (dim() < 3) {
     lower[2] = upper[2] = c[2];
@@ -792,11 +792,11 @@ Grid::alpha(int cell, Double x1, Double x2, Double x3) const {
 
 template <typename Double>
 Double
-Grid::beta(int n, int cell, Double x1, Double x2, Double x3) const {
+Grid::beta(int n, int cell, const Double& x1, const Double& x2, const Double& x3) const {
   Double result = 0.0;
 
   Vec3<int> c = m_mesh.get_cell_3d(cell);
-  Vec3<int> lower = c - Vec3<int>(1, 1, 1);
+  Vec3<int> lower = c - Vec3<int>(2, 2, 2);
   Vec3<int> upper = c + Vec3<int>(1, 1, 1);
   if (dim() < 3) {
     lower[2] = upper[2] = c[2];
@@ -841,11 +841,11 @@ Grid::beta(int n, int cell, Double x1, Double x2, Double x3) const {
 
 template <typename Double>
 Double
-Grid::inv_metric(int n, int m, int cell, Double x1, Double x2, Double x3) const {
+Grid::inv_metric(int n, int m, int cell, const Double& x1, const Double& x2, const Double& x3) const {
   Double result = 0.0;
 
   Vec3<int> c = m_mesh.get_cell_3d(cell);
-  Vec3<int> lower = c - Vec3<int>(1, 1, 1);
+  Vec3<int> lower = c - Vec3<int>(2, 2, 2);
   Vec3<int> upper = c + Vec3<int>(1, 1, 1);
   if (dim() < 3) {
     lower[2] = upper[2] = c[2];
@@ -864,11 +864,11 @@ Grid::inv_metric(int n, int m, int cell, Double x1, Double x2, Double x3) const 
 
 template <typename Double>
 Double
-Grid::connection(int n, int u, int v, int cell, Double x1, Double x2, Double x3) const {
+Grid::connection(int n, int u, int v, int cell, const Double& x1, const Double& x2, const Double& x3) const {
   Double result = 0.0;
 
   Vec3<int> c = m_mesh.get_cell_3d(cell);
-  Vec3<int> lower = c - Vec3<int>(1, 1, 1);
+  Vec3<int> lower = c - Vec3<int>(2, 2, 2);
   Vec3<int> upper = c + Vec3<int>(1, 1, 1);
   if (dim() < 3) {
     lower[2] = upper[2] = c[2];
@@ -883,6 +883,30 @@ Grid::connection(int n, int u, int v, int cell, Double x1, Double x2, Double x3)
     }
   }
   return result;
+}
+
+template <typename Double>
+Double
+Grid::alpha(int cell, const Vec3<Double>& x) const {
+  return alpha(cell, x[0], x[1], x[2]);
+}
+
+template <typename Double>
+Double
+Grid::beta(int n, int cell, const Vec3<Double>& x) const {
+  return beta(n, cell, x[0], x[1], x[2]);
+}
+
+template <typename Double>
+Double
+Grid::inv_metric(int i, int j, int cell, const Vec3<Double>& x) const {
+  return inv_metric(i, j, cell, x[0], x[1], x[2]);
+}
+
+template <typename Double>
+Double
+Grid::connection(int i, int u, int v, int cell, const Vec3<Double>& x) const {
+  return connection(i, u, v, cell, x[0], x[1], x[2]);
 }
 
 }
