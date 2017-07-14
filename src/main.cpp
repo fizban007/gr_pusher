@@ -39,7 +39,7 @@ mid_point(const Vec3<Double>& x, const Vec3<double>& x0, int c, int c0,
     }
     c_result = grid.mesh().get_idx(cell[0], cell[1], cell[2]);
   }
-  std::cout << "Mid point is (" << result[0].x() << ", " << result[1].x() << ", " << result[2].x() << ")" << std::endl;
+  // std::cout << "Mid point is (" << result[0].x() << ", " << result[1].x() << ", " << result[2].x() << ")" << std::endl;
   return result;
 }
 
@@ -51,7 +51,7 @@ Gamma(const Vec3<Double>& x, const Vec3<Double>& u, int cell,
   for (int i = 0; i < 3; i++)
     for (int j = 0; j < 3; j++)
       result += grid.inv_metric(i, j, cell, x) * u[i] * u[j];
-  std::cout << "alpha is " << grid.alpha(cell, x).x() << std::endl;
+  // std::cout << "alpha is " << grid.alpha(cell, x).x() << std::endl;
   result = sqrt(result) / grid.alpha(cell, x);
   return result;
 }
@@ -66,8 +66,10 @@ Fu(int n, const Vec3<double>& u0, const Vec3<double>& x0, int c0,
   Vec3<Double> mid_u(0.5 * (u[0] + u0[0]), 0.5 * (u[1] + u0[1]),
                      0.5 * (u[2] + u0[2]));
   Double gamma = Gamma(mid_x, mid_u, mid_cell, grid);
-  std::cout << "Gamma is " << gamma.x() << std::endl;
-  Double u_0 = grid.beta(0, mid_cell, mid_x) * mid_u[0] + grid.beta(1, mid_cell, mid_x) * mid_u[1] + grid.beta(2, mid_cell, mid_x) * mid_u[2] - grid.alpha(mid_cell, mid_x[0], mid_x[1], mid_x[2]) * gamma;
+  // std::cout << "Gamma is " << gamma.x() << std::endl;
+  Double u_0 = grid.beta(0, mid_cell, mid_x) * mid_u[0] + grid.beta(1, mid_cell, mid_x) * mid_u[1] + grid.beta(2, mid_cell, mid_x) * mid_u[2] - grid.alpha(mid_cell, mid_x) * grid.alpha(mid_cell, mid_x) * gamma;
+  std::cout << "u0 is " << u_0.x() << std::endl;
+
   Double conn = 0.0;
   for (int i = 1; i < 4; i++) {
     for (int j = 1; j < 4; j++) {
@@ -134,10 +136,12 @@ main(int argc, char* argv[]) {
   ////////////////////////////////////////////////////////////////////////////////
   ///  Set up iteration
   ////////////////////////////////////////////////////////////////////////////////
-  const int N = 10;
+  const int max_steps = 100;
+  const double tolerance = 1.0e-8;
   double dt = 0.001;
   typedef F<double> Var;
-  for (int i = 0; i < N; i++) {
+  for (int i = 0; i < max_steps; i++) {
+    std::cout << "at step " << i << std::endl;
     // Initialize guess solution
     Vec3<Var> x(p.x[0], p.x[1], p.x[2]);
     Vec3<Var> u(p.u[0], p.u[1], p.u[2]);
@@ -186,6 +190,7 @@ main(int argc, char* argv[]) {
       }
     }
     p.cell = grid.mesh().get_idx(new_cell[0], new_cell[1], new_cell[2]);
+    if (sqrt(new_f.dot(new_f)) <= tolerance) break;
     std::cout << p.x << " " << p.u << " " << p.cell << std::endl;
   }
 
