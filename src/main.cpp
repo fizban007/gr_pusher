@@ -104,7 +104,7 @@ Fx(int n, const Vec3<double>& u0, const Vec3<double>& x0, int c0,
     result -= dt * grid.inv_metric(n, j, mid_cell, mid_x) * mid_u[j];
   }
   result /= Gamma(mid_x, mid_u, mid_cell, grid);
-  result += x[n] - x0[n] - (cell_0[n] - cell[n]) * grid.mesh().delta[n] - grid.beta(n, mid_cell, mid_x);
+  result += x[n] - x0[n] - (cell_0[n] - cell[n]) * grid.mesh().delta[n] + grid.beta(n, mid_cell, mid_x);
   return result;
 }
 
