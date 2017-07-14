@@ -64,14 +64,14 @@ void select_metric(MetricType metric_type, Functor func, Args && ...args) {
   //   func(metric::g_metric_spherical, std::forward<Args>(args)...);
   } else if (metric_type == MetricType::log_spherical) {
     func(metric::g_metric_log_spherical, std::forward<Args>(args)...);
-  // } else if (metric_type == MetricType::Schwarzschild) {
+ // } else if (metric_type == MetricType::Schwarzschild) {
   //   func(metric::g_metric_schwarzschild, std::forward<Args>(args)...);
-  // } else if (metric_type == MetricType::Kerr_Schild) {
-  //   func(metric::g_metric_kerr_schild, std::forward<Args>(args)...);
-  // } else if (metric_type == MetricType::Boyer_Lindquist) {
-  //   func(metric::g_metric_boyer_lindquist, std::forward<Args>(args)...);
-  // } else if (metric_type == MetricType::log_Boyer_Lindquist) {
-  //   func(metric::g_metric_log_boyer_lindquist, std::forward<Args>(args)...);
+  } else if (metric_type == MetricType::Kerr_Schild) {
+    func(metric::g_metric_kerr_schild, std::forward<Args>(args)...);
+  } else if (metric_type == MetricType::Boyer_Lindquist) {
+    func(metric::g_metric_boyer_lindquist, std::forward<Args>(args)...);
+  } else if (metric_type == MetricType::log_Boyer_Lindquist) {
+    func(metric::g_metric_log_boyer_lindquist, std::forward<Args>(args)...);
   }
 }
 

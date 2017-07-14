@@ -1,11 +1,11 @@
 #ifndef _INTERPOLATION_H_
 #define _INTERPOLATION_H_
 
-#include <cmath>
-#include <utility>
 #include "cuda/cuda_control.h"
 #include "typedefs.h"
 #include "vec3.h"
+#include <cmath>
+#include <utility>
 // #include "boost/fusion/container/vector.hpp"
 
 #ifndef __CUDACC__
@@ -93,10 +93,10 @@ class Interpolator {
   }
 
   template <typename FloatT>
-  HD_INLINE Vec3<Scalar> interp_cell(const Vec3<FloatT>& pos,
-                                     const Vec3<int>& p_cell,
-                                     const Vec3<int>& target_cell,
-                                      Stagger_t stagger = Stagger_t("000")) const {
+  HD_INLINE Vec3<Scalar> interp_cell(
+      const Vec3<FloatT>& pos, const Vec3<int>& p_cell,
+      const Vec3<int>& target_cell,
+      Stagger_t stagger = Stagger_t("000")) const {
     return Vec3<Scalar>(
         interp_cell(pos[0], p_cell[0], target_cell[0], stagger[0]),
         interp_cell(pos[1], p_cell[1], target_cell[1], stagger[1]),

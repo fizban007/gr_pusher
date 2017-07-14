@@ -25,4 +25,4 @@
   #endif
 #endif   // ----- #ifdef __CUDACC__ -----
 
-#endif   // ----- #ifndef _CUDACONTROL_H_  ----- 
+#endif   // ----- #ifndef _CUDACONTROL_H_  -----

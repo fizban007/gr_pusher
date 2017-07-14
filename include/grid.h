@@ -51,14 +51,17 @@ class Grid {
     void operator()(const Metric& g, Grid& grid) const;
   } setup_scales;
 
+  void setup_inv_metric();
+
   // template <typename Metric>
   // void setup_alpha_beta(const Metric& g);
 
   // template <typename Metric>
   // void setup_gamma(const Metric& g);
 
-  // template <typename Metric>
-  // void setup_connection(const Metric& g);
+  template <typename Metric>
+  void setup_connection(const Metric& g);
+
   MultiArray<Scalar>& scales(int n, Stagger_t stagger);
   const MultiArray<Scalar>& scales(int n, Stagger_t stagger) const;
 
@@ -90,10 +93,10 @@ class Grid {
   // template <typename Metric>
   // void setup_beta(const Metric& g);
 
-  Scalar face_area(int n, int cell) const { return m_cell_face_area[n][cell]; }
-  Scalar face_area(int n, int c1, int c2, int c3 = 0) const {
-    return m_cell_face_area[n](c1, c2, c3);
-  }
+  // Scalar face_area(int n, int cell) const { return m_cell_face_area[n][cell]; }
+  // Scalar face_area(int n, int c1, int c2, int c3 = 0) const {
+    // return m_cell_face_area[n](c1, c2, c3);
+  // }
   // Scalar edge_length(int n, int cell) const {
   //   return m_cell_edge_length[n][cell];
   // }
@@ -105,13 +108,25 @@ class Grid {
   Scalar cell_volume(int cell) const;
 
   Scalar alpha(int n, int cell) const { return m_alpha[n][cell]; }
-  Scalar alpha(int cell, const Vec3<Pos_t>& rel_pos) const;
-  Scalar alpha(const Vec3<Scalar>& pos) const;
+  template <typename POS_T>
+  Scalar alpha(int cell, const Vec3<POS_T>& rel_pos) const;
+  template <typename POS_T>
+  Scalar alpha(const Vec3<POS_T>& pos) const;
 
   Scalar beta1(int n, int cell) const { return m_beta1[n][cell]; }
   Scalar beta2(int n, int cell) const { return m_beta2[n][cell]; }
   // Vector3 beta(int cell, const Vec3<Pos_t>& rel_pos) const;
   // Vector3 beta(const Vec3<Scalar>& pos) const;
+
+  // These methods are for interpolation and AD
+  template <typename Double>
+  Double alpha(int cell, Double x1, Double x2, Double x3) const;
+  template <typename Double>
+  Double beta(int n, int cell, Double x1, Double x2, Double x3) const;
+  template <typename Double>
+  Double inv_metric(int i, int j, int cell, Double x1, Double x2, Double x3) const;
+  template <typename Double>
+  Double connection(int i, int u, int v, int cell, Double x1, Double x2, Double x3) const;
 
   Scalar det(int n, int cell) const { return m_det[n][cell]; }
   // template <typename Pos_t>
@@ -121,19 +136,19 @@ class Grid {
 
   // First index is i, second is alpha, in the expression
   // g_{\alpha\beta, i}g^{\beta\mu}
-  // Scalar connection(int i, int a, int u, int pos) const {
-  //   return m_connection[i][a][u][pos];
-  // }
-  // template <typename Pos_t>
-  // void connection(int cell, const Vec3<Pos_t>& rel_pos, double conn[3][4][4],
-  // int interp = 1) const;
-  // template <typename Pos_t>
-  // void connection(const Vec3<Pos_t>& pos, double conn[3][4][4], int interp =
-  // 1) const;
+  Scalar connection(int i, int a, int u, int pos) const {
+    return m_connection[i][a][u][pos];
+  }
+  template <typename Pos_t>
+  void connection(int cell, const Vec3<Pos_t>& rel_pos, double conn[3][4][4],
+  int interp = 1) const;
+  template <typename Pos_t>
+  void connection(const Vec3<Pos_t>& pos, double conn[3][4][4], int interp =
+  1) const;
 
-  // Scalar connection(int i, int u, int a, int c1, int c2, int c3 = 0) const {
-  //   return m_connection[i][a][u](c1, c2, c3);
-  // }
+  Scalar connection(int i, int u, int a, int c1, int c2, int c3 = 0) const {
+    return m_connection[i][a][u](c1, c2, c3);
+  }
 
   Scalar alpha(int n, int c1, int c2, int c3 = 0) const {
     return m_alpha[n](c1, c2, c3);
@@ -169,9 +184,9 @@ class Grid {
   MetricType type() const { return m_type; }
   bool isGR() const { return m_metric_ptr->is_GR(); }
 
-  const std::array<MultiArray<Scalar>, 3>& face_area_array() const {
-    return m_cell_face_area;
-  }
+  // const std::array<MultiArray<Scalar>, 3>& face_area_array() const {
+  //   return m_cell_face_area;
+  // }
   // const std::array<multi_array<Scalar>, 3>& edge_length_array() const {
   //   return m_cell_edge_length;
   // }
@@ -200,6 +215,7 @@ class Grid {
   void parse_line(const std::string& line);
   void parse_line_nums(std::stringstream& nums, int n);
   void allocate_arrays();
+  std::array<std::array<double, 4>, 4> invert_mat4(const std::array<std::array<double, 4>, 4>& mat);
 
   std::size_t hash_line(const std::string& line, std::size_t seed = 0);
   std::size_t hash(const std::array<std::string, 3>& str, std::size_t seed = 0);
@@ -211,7 +227,7 @@ class Grid {
   const metric::metric_base_interface* m_metric_ptr;
 
   // alpha and beta are defined on face-centered positions
-  std::array<MultiArray<Scalar>, 3> m_cell_face_area;
+  // std::array<MultiArray<Scalar>, 3> m_cell_face_area;
   std::array<MultiArray<Scalar>, 3> m_alpha;
   // We only define two components of beta because we only need two transverse
   // components of beta at every cell face
@@ -224,7 +240,8 @@ class Grid {
 
   // TODO: work out the stagger of the metric tensor
   std::array<std::array<MultiArray<Scalar>, 3>, 3> m_metric;
-  std::array<std::array<bool, 3>, 3> m_metric_mask;
+  std::array<std::array<MultiArray<Scalar>, 3>, 3> m_inv_metric;
+  std::array<std::array<char, 3>, 3> m_metric_mask;
 
   // When using the differential solver it is better to use scale functions
   std::array<std::vector<MultiArray<Scalar>>, 3> m_scales;
@@ -233,9 +250,9 @@ class Grid {
   // time-independent
   // These coefficients are defined by g_{\alpha\beta, i}g^{\beta\mu}
   // \alpha and \mu are free indices from 0 to 3, and i can only be 1 to 3.
-  // std::array<std::array<std::array<multi_array<Scalar>, 4>, 4>, 3>
-  // m_connection;
-  // std::array<std::array<std::array<char, 4>, 4>, 3> m_connection_mask;
+  std::array<std::array<std::array<MultiArray<Scalar>, 4>, 4>, 3>
+  m_connection;
+  std::array<std::array<std::array<char, 4>, 4>, 3> m_connection_mask;
 };
 }
 

@@ -54,8 +54,11 @@ TEST_CASE("Kerr Schild derivative", "[metric]") {
   auto f = simplify(D<1>(D<2>(g)));
   auto f2 = simplify(D<2>(D<3>(g)));
 
-  f.print(); CudaLE::helper::print("\n");
-  f2.print(); CudaLE::helper::print("\n");
-  std::cout << f(2.0, 1.3, 2.0) << std::endl;
-  std::cout << f2(2.0, 1.3, 2.0) << std::endl;
+  // f.print(); CudaLE::helper::print("\n");
+  // f2.print(); CudaLE::helper::print("\n");
+
+  REQUIRE(f(2.0, 1.3, 2.0) == Approx(2.06201));
+  REQUIRE(f2(2.0, 1.3, 2.0) == Approx(0.0));
+  // std::cout << f(2.0, 1.3, 2.0) << std::endl;
+  // std::cout << f2(2.0, 1.3, 2.0) << std::endl;
 }

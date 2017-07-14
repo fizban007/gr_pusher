@@ -423,7 +423,8 @@ VectorField<T>::convertToFlux() {
           // double area = m_grid -> face_area(n, i, j, k);
           // if (normalize)
           //   m_array[n](i, j, k) /= m_grid -> norm(n, i, j, k);
-          m_array[n](i, j, k) *= m_grid -> face_area(n, i, j, k);
+          // m_array[n](i, j, k) *= m_grid -> face_area(n, i, j, k);
+          m_array[n](i, j, k) *= 1.0;
         }
       }
     }
@@ -438,7 +439,8 @@ VectorField<T>::convertFromFlux() {
     for (int j = 0; j < m_grid -> mesh().dims[1]; j++) {
       for (int i = 0; i < m_grid -> mesh().dims[0]; i++) {
         for (int n = 0; n < 3; n++) {
-          double area = m_grid -> face_area(n, i, j, k);
+          // double area = m_grid -> face_area(n, i, j, k);
+          double area = 1.0;
           // In case the area is zero, do nothing
           // FIXME: 1.0e-6 is magic number!
           if (std::abs(area) > 1.0e-6)
