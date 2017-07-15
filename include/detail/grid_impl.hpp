@@ -24,6 +24,24 @@
   + CudaLE::D<I + 1>( METRIC.g ## A ## 2 )(POS[0], POS[1], POS[2]) * G_INV[2][MU] \
   + CudaLE::D<I + 1>( METRIC.g ## A ## 3 )(POS[0], POS[1], POS[2]) * G_INV[3][MU]
 
+#define SUM_DG(METRIC,I,MU,NU,G_INV,POS) \
+  CudaLE::D<I + 1>( METRIC.g ## 0 ## 0 )(POS[0], POS[1], POS[2]) * G_INV[0][MU] * G_INV[0][NU] \
+  + CudaLE::D<I + 1>( METRIC.g ## 0 ## 1 )(POS[0], POS[1], POS[2]) * G_INV[0][MU] * G_INV[1][NU] \
+  + CudaLE::D<I + 1>( METRIC.g ## 0 ## 2 )(POS[0], POS[1], POS[2]) * G_INV[0][MU] * G_INV[2][NU] \
+  + CudaLE::D<I + 1>( METRIC.g ## 0 ## 3 )(POS[0], POS[1], POS[2]) * G_INV[0][MU] * G_INV[3][NU] \
+  + CudaLE::D<I + 1>( METRIC.g ## 1 ## 0 )(POS[0], POS[1], POS[2]) * G_INV[1][MU] * G_INV[0][NU] \
+  + CudaLE::D<I + 1>( METRIC.g ## 1 ## 1 )(POS[0], POS[1], POS[2]) * G_INV[1][MU] * G_INV[1][NU] \
+  + CudaLE::D<I + 1>( METRIC.g ## 1 ## 2 )(POS[0], POS[1], POS[2]) * G_INV[1][MU] * G_INV[2][NU] \
+  + CudaLE::D<I + 1>( METRIC.g ## 1 ## 3 )(POS[0], POS[1], POS[2]) * G_INV[1][MU] * G_INV[3][NU] \
+  + CudaLE::D<I + 1>( METRIC.g ## 2 ## 0 )(POS[0], POS[1], POS[2]) * G_INV[2][MU] * G_INV[0][NU] \
+  + CudaLE::D<I + 1>( METRIC.g ## 2 ## 1 )(POS[0], POS[1], POS[2]) * G_INV[2][MU] * G_INV[1][NU] \
+  + CudaLE::D<I + 1>( METRIC.g ## 2 ## 2 )(POS[0], POS[1], POS[2]) * G_INV[2][MU] * G_INV[2][NU] \
+  + CudaLE::D<I + 1>( METRIC.g ## 2 ## 3 )(POS[0], POS[1], POS[2]) * G_INV[2][MU] * G_INV[3][NU] \
+  + CudaLE::D<I + 1>( METRIC.g ## 3 ## 0 )(POS[0], POS[1], POS[2]) * G_INV[3][MU] * G_INV[0][NU] \
+  + CudaLE::D<I + 1>( METRIC.g ## 3 ## 1 )(POS[0], POS[1], POS[2]) * G_INV[3][MU] * G_INV[1][NU] \
+  + CudaLE::D<I + 1>( METRIC.g ## 3 ## 2 )(POS[0], POS[1], POS[2]) * G_INV[3][MU] * G_INV[2][NU] \
+  + CudaLE::D<I + 1>( METRIC.g ## 3 ## 3 )(POS[0], POS[1], POS[2]) * G_INV[3][MU] * G_INV[3][NU]
+
 namespace Aperture {
 
 // const int N_subdivide = 1;
@@ -496,38 +514,46 @@ Grid::setup_connection(const Metric& g) {
 
         int idx = m_mesh.get_idx(i, j, k);
         for (int mu = 0; mu < 4; mu++) {
+          for (int nu = 0; nu < 4; nu++) {
+            m_connection[0][mu][nu][idx] = SUM_DG(g,0,mu,nu,g_inv,pos);
+            if (m_connection[0][mu][nu][idx] != 0.0) m_connection_mask[0][mu][nu] = 1;
+            m_connection[1][mu][nu][idx] = SUM_DG(g,1,mu,nu,g_inv,pos);
+            if (m_connection[1][mu][nu][idx] != 0.0) m_connection_mask[1][mu][nu] = 1;
+            m_connection[2][mu][nu][idx] = SUM_DG(g,2,mu,nu,g_inv,pos);
+            if (m_connection[2][mu][nu][idx] != 0.0) m_connection_mask[2][mu][nu] = 1;
+          }
           // This is the only loop we can iterate over
           // First index is i, second is alpha, in the expression
           // g_{\alpha\beta, i}g^{\beta\mu}
           // m_connection[0][0][mu] = PARTIAL_G(g,0,0,1,pos) * g_inv(0, mu);
-          m_connection[0][0][mu][idx] = SUM_PARTIAL_G(g,0,0,mu,g_inv,pos);
-          if (m_connection[0][0][mu][idx] != 0.0) m_connection_mask[0][0][mu] = 1;
-          m_connection[0][1][mu][idx] = SUM_PARTIAL_G(g,1,0,mu,g_inv,pos);
-          if (m_connection[0][1][mu][idx] != 0.0) m_connection_mask[0][1][mu] = 1;
-          m_connection[0][2][mu][idx] = SUM_PARTIAL_G(g,2,0,mu,g_inv,pos);
-          if (m_connection[0][2][mu][idx] != 0.0) m_connection_mask[0][2][mu] = 1;
-          m_connection[0][3][mu][idx] = SUM_PARTIAL_G(g,3,0,mu,g_inv,pos);
-          if (m_connection[0][3][mu][idx] != 0.0) m_connection_mask[0][3][mu] = 1;
-          m_connection[1][0][mu][idx] = SUM_PARTIAL_G(g,0,1,mu,g_inv,pos);
-          if (m_connection[1][0][mu][idx] != 0.0) m_connection_mask[1][0][mu] = 1;
-          m_connection[1][1][mu][idx] = SUM_PARTIAL_G(g,1,1,mu,g_inv,pos);
-          if (m_connection[1][1][mu][idx] != 0.0) m_connection_mask[1][1][mu] = 1;
-          m_connection[1][2][mu][idx] = SUM_PARTIAL_G(g,2,1,mu,g_inv,pos);
-          if (m_connection[1][2][mu][idx] != 0.0) m_connection_mask[1][2][mu] = 1;
-          m_connection[1][3][mu][idx] = SUM_PARTIAL_G(g,3,1,mu,g_inv,pos);
-          if (m_connection[1][3][mu][idx] != 0.0) m_connection_mask[1][3][mu] = 1;
-          // By default the simulation is 2D, therefore third derivative is
-          // always zero because we assume it's symmetry direction
-          if (m_mesh.dim() > 2) {
-            m_connection[2][0][mu][idx] = SUM_PARTIAL_G(g,0,2,mu,g_inv,pos);
-            if (m_connection[2][0][mu][idx] != 0.0) m_connection_mask[2][0][mu] = 1;
-            m_connection[2][1][mu][idx] = SUM_PARTIAL_G(g,1,2,mu,g_inv,pos);
-            if (m_connection[2][1][mu][idx] != 0.0) m_connection_mask[2][1][mu] = 1;
-            m_connection[2][2][mu][idx] = SUM_PARTIAL_G(g,2,2,mu,g_inv,pos);
-            if (m_connection[2][2][mu][idx] != 0.0) m_connection_mask[2][2][mu] = 1;
-            m_connection[2][3][mu][idx] = SUM_PARTIAL_G(g,3,2,mu,g_inv,pos);
-            if (m_connection[2][3][mu][idx] != 0.0) m_connection_mask[2][3][mu] = 1;
-          }
+        //   m_connection[0][0][mu][idx] = SUM_DG(g,0,0,mu,g_inv,pos);
+        //   if (m_connection[0][0][mu][idx] != 0.0) m_connection_mask[0][0][mu] = 1;
+        //   m_connection[0][1][mu][idx] = SUM_DG(g,1,0,mu,g_inv,pos);
+        //   if (m_connection[0][1][mu][idx] != 0.0) m_connection_mask[0][1][mu] = 1;
+        //   m_connection[0][2][mu][idx] = SUM_DG(g,2,0,mu,g_inv,pos);
+        //   if (m_connection[0][2][mu][idx] != 0.0) m_connection_mask[0][2][mu] = 1;
+        //   m_connection[0][3][mu][idx] = SUM_DG(g,3,0,mu,g_inv,pos);
+        //   if (m_connection[0][3][mu][idx] != 0.0) m_connection_mask[0][3][mu] = 1;
+        //   m_connection[1][0][mu][idx] = SUM_DG(g,0,1,mu,g_inv,pos);
+        //   if (m_connection[1][0][mu][idx] != 0.0) m_connection_mask[1][0][mu] = 1;
+        //   m_connection[1][1][mu][idx] = SUM_DG(g,1,1,mu,g_inv,pos);
+        //   if (m_connection[1][1][mu][idx] != 0.0) m_connection_mask[1][1][mu] = 1;
+        //   m_connection[1][2][mu][idx] = SUM_DG(g,2,1,mu,g_inv,pos);
+        //   if (m_connection[1][2][mu][idx] != 0.0) m_connection_mask[1][2][mu] = 1;
+        //   m_connection[1][3][mu][idx] = SUM_DG(g,3,1,mu,g_inv,pos);
+        //   if (m_connection[1][3][mu][idx] != 0.0) m_connection_mask[1][3][mu] = 1;
+        //   // By default the simulation is 2D, therefore third derivative is
+        //   // always zero because we assume it's symmetry direction
+        //   if (m_mesh.dim() > 2) {
+        //     m_connection[2][0][mu][idx] = SUM_DG(g,0,2,mu,g_inv,pos);
+        //     if (m_connection[2][0][mu][idx] != 0.0) m_connection_mask[2][0][mu] = 1;
+        //     m_connection[2][1][mu][idx] = SUM_DG(g,1,2,mu,g_inv,pos);
+        //     if (m_connection[2][1][mu][idx] != 0.0) m_connection_mask[2][1][mu] = 1;
+        //     m_connection[2][2][mu][idx] = SUM_DG(g,2,2,mu,g_inv,pos);
+        //     if (m_connection[2][2][mu][idx] != 0.0) m_connection_mask[2][2][mu] = 1;
+        //     m_connection[2][3][mu][idx] = SUM_DG(g,3,2,mu,g_inv,pos);
+        //     if (m_connection[2][3][mu][idx] != 0.0) m_connection_mask[2][3][mu] = 1;
+        //   }
         }
       }
     }
@@ -916,6 +942,10 @@ Grid::connection(int i, int u, int v, int cell, const Vec3<Double>& x) const {
 
 #ifdef SUM_PARTIAL_G
 #undef SUM_PARTIAL_G
+#endif
+
+#ifdef SUM_DG
+#undef SUM_DG
 #endif
 
 #endif  // _GRID_IMPL_HPP_

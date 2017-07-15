@@ -141,9 +141,13 @@ TEST_CASE("Spherical alpha", "[grid]") {
   for (int j = 1; j < 67; j++) {
     for (int i = 1; i < 67; i++) {
       REQUIRE(g.alpha(0, i, j) == Approx(1.0));
-      REQUIRE(g.alpha(i + j * 68, Vec3<double>(0.2 * g.mesh().delta[0],0.3 * g.mesh().delta[1,0.0)) == Approx(1.0));
+      REQUIRE(g.alpha(i + j * 68, Vec3<double>(0.2 * g.mesh().delta[0],0.3 * g.mesh().delta[1],0.0)) == Approx(1.0));
     }
   }
+}
+
+TEST_CASE("Spherical connection", "[grid]") {
+
 }
 
 TEST_CASE("Making dual", "[grid]") {
