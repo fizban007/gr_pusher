@@ -73,3 +73,19 @@ TEST_CASE("Grid interpolation of alpha", "[grid][derivative]") {
   std::cout << "dfdx2(x) = " << dfdx2 << std::endl;
   std::cout << "dfdx3(x) = " << dfdx3 << std::endl;
 }
+
+TEST_CASE("Complex compounded derivatives with intermediate values", "[derivative]") {
+  F<double> x, y, f;
+  x = 0.3; x.diff(0, 2);
+  y = 0.4; y.diff(1, 2);
+  F<double> g = x * x - sqrt(1.0 + x * x + y * y);
+  f = (x * x + y * y) / g;
+
+  double fval = f.x();
+  double dfdx = f.d(0);
+  double dfdy = f.d(1);
+
+  std::cout << "f(x) = " << fval << std::endl;
+  std::cout << "dfdx(x) = " << dfdx << std::endl;
+  std::cout << "dfdy(x) = " << dfdy << std::endl;
+}
