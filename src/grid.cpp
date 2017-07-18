@@ -295,17 +295,18 @@ Grid::save_to_disk() {
     // fs.write((char*)m_norm[i].data(), m_mesh.size() * sizeof(Scalar));
     fs.write((char*)m_det[i].data(), m_mesh.size() * sizeof(Scalar));
     for (int j = 0; j < 3; j++) {
-      if (m_metric[i][j].size() > 0)
-        fs.write((char*)m_metric[i][j].data(), m_mesh.size() * sizeof(Scalar));
       fs.write(&m_metric_mask[i][j], sizeof(char));
+      if (m_metric_mask[i][j] == 1)
+        fs.write((char*)m_metric[i][j].data(), m_mesh.size() * sizeof(Scalar));
     }
     for (int j = 0; j < 3; j++) {
       fs.write((char*)m_inv_metric[i][j].data(), m_mesh.size() * sizeof(Scalar));
     }
     for (int j = 0; j < 4; j++) {
       for (int k = 0; k < 4; k++) {
-        fs.write((char*)m_connection[i][j][k].data(), m_mesh.size() * sizeof(Scalar));
         fs.write(&m_connection_mask[i][j][k], sizeof(char));
+        if (m_connection_mask[i][j][k] == 1)
+          fs.write((char*)m_connection[i][j][k].data(), m_mesh.size() * sizeof(Scalar));
         // fs.write((char*)m_connection_mask[i][j][k], m_mesh.size() * sizeof(char));
       }
     }
@@ -332,17 +333,18 @@ Grid::load_from_disk() {
     // fs.read((char*)m_norm[i].data(), m_mesh.size() * sizeof(Scalar));
     fs.read((char*)m_det[i].data(), m_mesh.size() * sizeof(Scalar));
     for (int j = 0; j < 3; j++) {
-      if (m_metric[i][j].size() > 0)
-        fs.read((char*)m_metric[i][j].data(), m_mesh.size() * sizeof(Scalar));
       fs.read(&m_metric_mask[i][j], sizeof(char));
+      if (m_metric_mask[i][j] == 1)
+        fs.read((char*)m_metric[i][j].data(), m_mesh.size() * sizeof(Scalar));
     }
     for (int j = 0; j < 3; j++) {
       fs.read((char*)m_inv_metric[i][j].data(), m_mesh.size() * sizeof(Scalar));
     }
     for (int j = 0; j < 4; j++) {
       for (int k = 0; k < 4; k++) {
-        fs.read((char*)m_connection[i][j][k].data(), m_mesh.size() * sizeof(Scalar));
         fs.read(&m_connection_mask[i][j][k], sizeof(char));
+        if (m_connection_mask[i][j][k] == 1)
+          fs.read((char*)m_connection[i][j][k].data(), m_mesh.size() * sizeof(Scalar));
       }
     }
   }

@@ -344,22 +344,22 @@ Grid::setup_metric_f::operator()(const Metric& g, Grid& grid) const {
   grid.m_metric[0][0].resize(grid.m_mesh.extent());
   grid.m_metric[1][1].resize(grid.m_mesh.extent());
   grid.m_metric[2][2].resize(grid.m_mesh.extent());
-  grid.m_metric_mask[0][0] = grid.m_metric_mask[1][1] = grid.m_metric_mask[2][2] = true;
+  grid.m_metric_mask[0][0] = grid.m_metric_mask[1][1] = grid.m_metric_mask[2][2] = 1;
   // optionally do the non-diagonal depending on spatial metric
   if (g.g12 != CudaLE::ZeroOp()) {
     grid.m_metric[0][1].resize(grid.m_mesh.extent());
     grid.m_metric[1][0].resize(grid.m_mesh.extent());
-    grid.m_metric_mask[0][1] = grid.m_metric_mask[1][0] = true;
+    grid.m_metric_mask[0][1] = grid.m_metric_mask[1][0] = 1;
   }
   if (g.g13 != CudaLE::ZeroOp()) {
     grid.m_metric[0][2].resize(grid.m_mesh.extent());
     grid.m_metric[2][0].resize(grid.m_mesh.extent());
-    grid.m_metric_mask[0][2] = grid.m_metric_mask[2][0] = true;
+    grid.m_metric_mask[0][2] = grid.m_metric_mask[2][0] = 1;
   }
   if (g.g23 != CudaLE::ZeroOp()) {
     grid.m_metric[1][2].resize(grid.m_mesh.extent());
     grid.m_metric[2][1].resize(grid.m_mesh.extent());
-    grid.m_metric_mask[1][2] = grid.m_metric_mask[2][1] = true;
+    grid.m_metric_mask[1][2] = grid.m_metric_mask[2][1] = 1;
   }
 
   for (int i = 0; i < 3; i++) {
