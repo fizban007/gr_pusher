@@ -23,15 +23,16 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 # Find external dependencies
-find_package(Eigen3)
-if (EIGEN3_FOUND)
-  message(${EIGEN3_INCLUDE_DIR})
-endif()
+# find_package(Eigen3)
+# if (EIGEN3_FOUND)
+#   message(${EIGEN3_INCLUDE_DIR})
+# endif()
 
 # Set include directories
 set(CUDALE_INCLUDE_DIR deps/CudaLE/include)
 set(CATCH_INCLUDE_DIR deps/catch/single_include)
 set(FADBAD_INCLUDE_DIR deps/FADBAD++)
+set(EIGEN3_INCLUDE_DIR deps/eigen)
 
 include_directories(${EIGEN3_INCLUDE_DIR} ${CUDALE_INCLUDE_DIR} ${CATCH_INCLUDE_DIR} ${FADBAD_INCLUDE_DIR} include)
 
