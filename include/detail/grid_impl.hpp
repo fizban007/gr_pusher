@@ -792,6 +792,28 @@ Grid::alpha(const Vec3<POS_T>& pos) const {
 //   return m_det[2][cell] * m_mesh.delta[0] * m_mesh.delta[1] * (dim() > 2 ? m_mesh.delta[2] : 1.0);
 // }
 
+template <typename Double>
+Double
+Grid::det(int cell, const Double& x1, const Double& x2, const Double& x3) const {
+  Double result = 0.0;
+
+  Vec3<int> c = m_mesh.get_cell_3d(cell);
+  Vec3<int> lower = c - Vec3<int>(1, 1, 1);
+  Vec3<int> upper = c + Vec3<int>(1, 1, 1);
+  if (dim() < 3) {
+    lower[2] = upper[2] = c[2];
+  }
+  for (int k = lower[2]; k <= upper[2]; k++) {
+    for (int j = lower[1]; j <= upper[1]; j++) {
+      for (int i = lower[0]; i <= upper[0]; i++) {
+        result += m_det[0](i, j, k) * interp_cell(x1, i - c[0], m_mesh.delta[0], 1)
+                  * interp_cell(x2, j - c[1], m_mesh.delta[1], 0)
+                  * (dim() < 3 ? 1.0 : interp_cell(x3, k - c[2], m_mesh.delta[2], 0));
+      }
+    }
+  }
+  return result;
+}
 
 template <typename Double>
 Double
@@ -807,9 +829,6 @@ Grid::alpha(int cell, const Double& x1, const Double& x2, const Double& x3) cons
   for (int k = lower[2]; k <= upper[2]; k++) {
     for (int j = lower[1]; j <= upper[1]; j++) {
       for (int i = lower[0]; i <= upper[0]; i++) {
-        // std::cout << i << ", " << c[0] << ", " << interp_cell(x1, i - c[0], m_mesh.delta[0], 1).x() << std::endl;
-        // std::cout << j << ", " << c[1] << ", " << interp_cell(x2, j - c[1], m_mesh.delta[1], 0).x() << std::endl;
-        // std::cout << k << ", " << c[2] << ", " << (dim() < 3 ? 1.0 : interp_cell(x3, k - c[2], m_mesh.delta[2], 0).x()) << std::endl;
         result += m_alpha[0](i, j, k) * interp_cell(x1, i - c[0], m_mesh.delta[0], 1)
                   * interp_cell(x2, j - c[1], m_mesh.delta[1], 0)
                   * (dim() < 3 ? 1.0 : interp_cell(x3, k - c[2], m_mesh.delta[2], 0));
@@ -870,6 +889,30 @@ Grid::beta(int n, int cell, const Double& x1, const Double& x2, const Double& x3
 
 template <typename Double>
 Double
+Grid::metric(int n, int m, int cell, const Double& x1, const Double& x2, const Double& x3) const {
+  Double result = 0.0;
+
+  Vec3<int> c = m_mesh.get_cell_3d(cell);
+  Vec3<int> lower = c - Vec3<int>(1, 1, 1);
+  Vec3<int> upper = c + Vec3<int>(1, 1, 1);
+  if (dim() < 3) {
+    lower[2] = upper[2] = c[2];
+  }
+  for (int k = lower[2]; k <= upper[2]; k++) {
+    for (int j = lower[1]; j <= upper[1]; j++) {
+      for (int i = lower[0]; i <= upper[0]; i++) {
+        if (m_metric_mask[n][m] == 1)
+          result += m_metric[n][m](i, j, k) * interp_cell(x1, i - c[0], m_mesh.delta[0], 0)
+                    * interp_cell(x2, j - c[1], m_mesh.delta[1], 0)
+                    * (dim() < 3 ? 1.0 : interp_cell(x3, k - c[2], m_mesh.delta[2], 0));
+      }
+    }
+  }
+  return result;
+}
+
+template <typename Double>
+Double
 Grid::inv_metric(int n, int m, int cell, const Double& x1, const Double& x2, const Double& x3) const {
   Double result = 0.0;
 
@@ -905,13 +948,20 @@ Grid::connection(int n, int u, int v, int cell, const Double& x1, const Double& 
   for (int k = lower[2]; k <= upper[2]; k++) {
     for (int j = lower[1]; j <= upper[1]; j++) {
       for (int i = lower[0]; i <= upper[0]; i++) {
-        result += m_connection[n][u][v](i, j, k) * interp_cell(x1, i - c[0], m_mesh.delta[0], 0)
-                  * interp_cell(x2, j - c[1], m_mesh.delta[1], 0)
-                  * (dim() < 3 ? 1.0 : interp_cell(x3, k - c[2], m_mesh.delta[2], 0));
+        if (m_connection_mask[n][u][v] == 1)
+          result += m_connection[n][u][v](i, j, k) * interp_cell(x1, i - c[0], m_mesh.delta[0], 0)
+                    * interp_cell(x2, j - c[1], m_mesh.delta[1], 0)
+                    * (dim() < 3 ? 1.0 : interp_cell(x3, k - c[2], m_mesh.delta[2], 0));
       }
     }
   }
   return result;
+}
+
+template <typename Double>
+Double
+Grid::det(int cell, const Vec3<Double>& x) const {
+  return det(cell, x[0], x[1], x[2]);
 }
 
 template <typename Double>
@@ -924,6 +974,12 @@ template <typename Double>
 Double
 Grid::beta(int n, int cell, const Vec3<Double>& x) const {
   return beta(n, cell, x[0], x[1], x[2]);
+}
+
+template <typename Double>
+Double
+Grid::metric(int i, int j, int cell, const Vec3<Double>& x) const {
+  return metric(i, j, cell, x[0], x[1], x[2]);
 }
 
 template <typename Double>

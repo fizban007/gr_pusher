@@ -74,10 +74,10 @@ class Grid {
   bool beta2_mask(int n) const { return m_beta2_mask[n]; }
   bool conn_mask(int n, int u, int v) const { return m_connection_mask[n][u][v] == 1; }
 
-  Scalar metric(int n, int m, const Vec3<Scalar>& global_pos,
-                int interp = 1) const;
-  Scalar metric(int n, int m, int cell, const Vec3<Pos_t>& rel_pos,
-                int interp = 1) const;
+  // Scalar metric(int n, int m, const Vec3<Scalar>& global_pos,
+  //               int interp = 1) const;
+  // Scalar metric(int n, int m, int cell, const Vec3<Pos_t>& rel_pos,
+  //               int interp = 1) const;
 
   // Matrix3 metric_matrix(int cell, const Vec3<Pos_t>& rel_pos, int interp = 1)
   // const;
@@ -121,17 +121,25 @@ class Grid {
 
   // These methods are for interpolation and AD
   template <typename Double>
+  Double det(int cell, const Double& x1, const Double& x2, const Double& x3) const;
+  template <typename Double>
   Double alpha(int cell, const Double& x1, const Double& x2, const Double& x3) const;
   template <typename Double>
   Double beta(int n, int cell, const Double& x1, const Double& x2, const Double& x3) const;
+  template <typename Double>
+  Double metric(int i, int j, int cell, const Double& x1, const Double& x2, const Double& x3) const;
   template <typename Double>
   Double inv_metric(int i, int j, int cell, const Double& x1, const Double& x2, const Double& x3) const;
   template <typename Double>
   Double connection(int i, int u, int v, int cell, const Double& x1, const Double& x2, const Double& x3) const;
   template <typename Double>
+  Double det(int cell, const Vec3<Double>& x) const;
+  template <typename Double>
   Double alpha(int cell, const Vec3<Double>& x) const;
   template <typename Double>
   Double beta(int n, int cell, const Vec3<Double>& x) const;
+  template <typename Double>
+  Double metric(int i, int j, int cell, const Vec3<Double>& x) const;
   template <typename Double>
   Double inv_metric(int i, int j, int cell, const Vec3<Double>& x) const;
   template <typename Double>

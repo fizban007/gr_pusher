@@ -153,6 +153,9 @@ class VectorField : public FieldBase {
   Vec3<T> interpolate(const Vec3<int> &c, const Vec3<Pos_t> &rel_pos,
                       int order = 1) const;
 
+  template <typename Double>
+  Double interpolate(int n, int cell, const Vec3<Double>& x) const;
+
   void recenter(self_type& output) const;
 
   self_type &convertToFlux();
