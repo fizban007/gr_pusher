@@ -4,6 +4,7 @@
 #include "grid.h"
 #include "metrics.h"
 #include "vec3.h"
+#include "fields.h"
 #include "utils/timer.h"
 
 using namespace Aperture;
@@ -86,8 +87,56 @@ Fu(int n, const Vec3<double>& u0, const Vec3<double>& x0, int c0,
       conn += grid.connection(n, 0, i + 1, mid_cell, mid_x) * mid_u[i] * u_0;
   }
   conn += grid.connection(n, 0, 0, mid_cell, mid_x) * u_0 * u_0;
-  // return u[n] - u0[n] - dt * conn / (Gamma(x, u, cell, grid) + Gamma(x0, u0, c0, grid));
-  return u[n] - u0[n] - 0.5 * dt * conn / Gamma(mid_x, mid_u, mid_cell, grid);
+  return u[n] - u0[n] - dt * conn / (Gamma(x, u, cell, grid) + Gamma(x0, u0, c0, grid));
+  // return u[n] - u0[n] - 0.5 * dt * conn / Gamma(mid_x, mid_u, mid_cell, grid);
+}
+
+template <typename Double>
+Double
+Fu(int n, const Vec3<double>& u0, const Vec3<double>& x0, int c0,
+   const Vec3<Double>& u, const Vec3<Double>& x, int cell, const VectorField<double>& E,
+   const VectorField<double>& B, double dt, double q_over_m) {
+  auto grid = E.grid();
+  int mid_cell = 0;
+  Vec3<Double> mid_x = mid_point(x, x0, cell, c0, mid_cell, grid);
+  Vec3<Double> mid_u(0.5 * (u[0] + u0[0]), 0.5 * (u[1] + u0[1]),
+                     0.5 * (u[2] + u0[2]));
+  Double gamma = Gamma(mid_x, mid_u, mid_cell, grid);
+  // std::cout << "Gamma is " << gamma.x() << std::endl;
+  Double u_0 = grid.beta(0, mid_cell, mid_x) * mid_u[0] + grid.beta(1, mid_cell, mid_x) * mid_u[1] + grid.beta(2, mid_cell, mid_x) * mid_u[2] - grid.alpha(mid_cell, mid_x) * grid.alpha(mid_cell, mid_x) * gamma;
+  // std::cout << "u0 is " << u_0.x() << std::endl;
+
+  // Metric part
+  Double conn = 0.0;
+  for (int i = 1; i < 4; i++) {
+    for (int j = 1; j < 4; j++) {
+      if (grid.conn_mask(n, i, j))
+        conn += grid.connection(n, i, j, mid_cell, mid_x) *
+                mid_u[i - 1] * mid_u[j - 1];
+    }
+  }
+  for (int i = 0; i < 3; i++) {
+    if (grid.conn_mask(n, i + 1, 0))
+      conn += grid.connection(n, i + 1, 0, mid_cell, mid_x) * mid_u[i] * u_0;
+    if (grid.conn_mask(n, 0, i + 1))
+      conn += grid.connection(n, 0, i + 1, mid_cell, mid_x) * mid_u[i] * u_0;
+  }
+
+  conn += grid.connection(n, 0, 0, mid_cell, mid_x) * u_0 * u_0;
+
+  // E & M part
+  Double f_em = 0.0;
+  for (int i = 0; i < 3; i++) {
+    if (grid.metric_mask(n, i) == 1)
+      f_em += grid.metric(n, i, mid_cell, mid_x) * E.interpolate(i, mid_cell, mid_x);
+  }
+  int trans[2] { (n + 1) % 3, (n + 2) % 3 };
+  f_em += sqrt(grid.det(mid_cell, mid_x)) * (u[trans[0]] + u0[trans[0]]) * B.interpolate(trans[1], mid_cell, mid_x) / (Gamma(x, u, cell, grid) + Gamma(x0, u0, c0, grid));
+  f_em -= sqrt(grid.det(mid_cell, mid_x)) * (u[trans[1]] + u0[trans[1]]) * B.interpolate(trans[0], mid_cell, mid_x) / (Gamma(x, u, cell, grid) + Gamma(x0, u0, c0, grid));
+  f_em *= grid.alpha(mid_cell, mid_x) * dt * q_over_m;
+
+  return u[n] - u0[n] - dt * conn / (Gamma(x, u, cell, grid) + Gamma(x0, u0, c0, grid)) - f_em;
+  // return u[n] - u0[n] - 0.5 * dt * conn / Gamma(mid_x, mid_u, mid_cell, grid) - f_em;
 }
 
 template <typename Double>
@@ -105,7 +154,6 @@ Fx(int n, const Vec3<double>& u0, const Vec3<double>& x0, int c0,
   for (int j = 0; j < 3; j++) {
     result -= dt * grid.inv_metric(n, j, mid_cell, mid_x) * (u[j] +  u0[j]);
   }
-  // std::cout << "gamma u2 is (" << (grid.inv_metric(n, 1, mid_cell, mid_x) * (u0[1] + u[1])).x() << ")" << std::endl;
   // result /= (Gamma(x, u, c, grid) + Gamma(x0, u0, c0, grid));
   result /= 2.0 * Gamma(mid_x, mid_u, mid_cell, grid);
   result += x[n] - x0[n] - (cell_0[n] - cell[n]) * grid.mesh().delta[n] + dt * grid.beta(n, mid_cell, mid_x);
@@ -177,9 +225,6 @@ int iterate_newton(Particle& p, const Grid& grid, double dt) {
     if (new_f.norm() <= tolerance) break;
     if (i == max_steps - 1) return 1;
   }
-  double u_0 = grid.beta(0, p.cell, p.x) * p.u[0] + grid.beta(1, p.cell, p.x) * p.u[1] + grid.beta(2, p.cell, p.x) * p.u[2] - grid.alpha(p.cell, p.x) * grid.alpha(p.cell, p.x) * Gamma(p.x, p.u, p.cell, grid);
-  auto pos = grid.mesh().pos_particle(p.cell, p.x);
-  std::cout << pos << " " << pos.x * sin(pos.y) <<  " " << p.u << " " << u_0 << std::endl;
   // std::cout << p.x << ", " << grid.mesh().get_cell_3d(p.cell) << std::endl;
   return 0;
 }
