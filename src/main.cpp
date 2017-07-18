@@ -219,6 +219,10 @@ main(int argc, char* argv[]) {
   for (int n = 0; n < 1000; n++) {
     std::cout << "At timestep " << n << std::endl;
     if (iterate_newton(p, grid, dt) == 1) break;
+    if (!grid.mesh().is_in_bulk(p.cell)) {
+      std::cout << "Out of computational box!" << std::endl;
+      break;
+    }
   }
 
   return 0;
