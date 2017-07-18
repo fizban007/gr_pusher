@@ -25,29 +25,29 @@ struct metric_boyer_lindquist : public metric_base<metric_boyer_lindquist> {
     return "Boyer-Lindquist" + std::to_string(m_rg) + std::to_string(m_a);
   }
 
-  DEFINE_FUNCTOR(rho2, _1 * _1 + square(m_a * cos(_2)));
-  DEFINE_FUNCTOR(z, _1 * m_rg / rho2);
-  DEFINE_FUNCTOR(delta, _1* _1 + m_a * m_a - m_rg * _1);
-  DEFINE_FUNCTOR(sigma, square(_1 * _1 + m_a * m_a) -
-                 delta * square(m_a * sin(_2)));
+  DEFINE_FUNCTOR(rho2, _r * _r + square(m_a * cos(_theta)));
+  DEFINE_FUNCTOR(z, _r * m_rg / rho2);
+  DEFINE_FUNCTOR(delta, _r* _r + m_a * m_a - m_rg * _r);
+  DEFINE_FUNCTOR(sigma, square(_r * _r + m_a * m_a) -
+                 delta * square(m_a * sin(_theta)));
   DEFINE_FUNCTOR(g11, rho2 / delta);
   DEFINE_FUNCTOR(g22, rho2);
-  DEFINE_FUNCTOR(g33, sigma * square(sin(_2)) / rho2);
+  DEFINE_FUNCTOR(g33, sigma * square(sin(_theta)) / rho2);
 
   DEFINE_FUNCTOR(a, sqrt(rho2 * delta / sigma));
-  DEFINE_FUNCTOR(b3, -m_a * m_rg * _1 / sigma);
+  DEFINE_FUNCTOR(b3, -m_a * m_rg * _r / sigma);
 
   DEFINE_FUNCTOR(g00, z - 1.0);
-  DEFINE_FUNCTOR(g03, -1.0 * z * m_a * square(sin(_2)));
-  DEFINE_FUNCTOR(g30, -1.0 * z * m_a * square(sin(_2)));
+  DEFINE_FUNCTOR(g03, -1.0 * z * m_a * square(sin(_theta)));
+  DEFINE_FUNCTOR(g30, -1.0 * z * m_a * square(sin(_theta)));
 
   metric_boyer_lindquist() : m_rg(2.0), m_a(0.0) {}
   metric_boyer_lindquist(double rg, double a) : m_rg(rg), m_a(a) {}
   ~metric_boyer_lindquist() {}
 
   HD_INLINE void PosToCartesian(Vec3<Scalar>& pos) const {
-    // detail::general_sph_pos_to_cart(pos, _1, g33);
-    detail::general_sph_pos_to_cart(pos, sqrt(_1 * _1 + m_a * m_a), (_1 * _1 + m_a * m_a) * square(sin(_2)));
+    // detail::general_sph_pos_to_cart(pos, _r, g33);
+    detail::general_sph_pos_to_cart(pos, sqrt(_r * _r + m_a * m_a), (_r * _r + m_a * m_a) * square(sin(_theta)));
     // detail::general_sph_pos_to_cart(pos);
   }
 

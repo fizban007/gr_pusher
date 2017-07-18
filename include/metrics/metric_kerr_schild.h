@@ -7,6 +7,9 @@ namespace Aperture {
 
 namespace metric {
 
+using CudaLE::placeholders::spherical::_r;
+using CudaLE::placeholders::spherical::_theta;
+
 struct metric_kerr_schild : public metric_base<metric_kerr_schild> {
  public:
   double m_rg, m_a;  // r_g is 2M and a is the angular momentum of the BH
@@ -21,15 +24,15 @@ struct metric_kerr_schild : public metric_base<metric_kerr_schild> {
     return "Kerr-Schild" + std::to_string(m_rg) + std::to_string(m_a);
   }
 
-  DEFINE_FUNCTOR(rho2, _1 * _1 + m_a * m_a * square(cos(_2)));
-  DEFINE_FUNCTOR(z, _1 * m_rg / rho2);
-  DEFINE_FUNCTOR(delta, _1 * _1 + m_a * m_a - m_rg * _1);
+  DEFINE_FUNCTOR(rho2, _r * _r + m_a * m_a * square(cos(_theta)));
+  DEFINE_FUNCTOR(z, _r * m_rg / rho2);
+  DEFINE_FUNCTOR(delta, _r * _r + m_a * m_a - m_rg * _r);
   DEFINE_FUNCTOR(g11, 1.0 + z);
   DEFINE_FUNCTOR(g22, rho2);
-  DEFINE_FUNCTOR(g33, (square(_1 * _1 + m_a * m_a) -
-                       square(m_a * sin(_2)) * delta) *
-                 square(sin(_2)) / g22);
-  DEFINE_FUNCTOR(g13, -m_a * square(sin(_2)) * g11);
+  DEFINE_FUNCTOR(g33, (square(_r * _r + m_a * m_a) -
+                       square(m_a * sin(_theta)) * delta) *
+                 square(sin(_theta)) / g22);
+  DEFINE_FUNCTOR(g13, -m_a * square(sin(_theta)) * g11);
   DEFINE_FUNCTOR(g31, g13);
 
   DEFINE_FUNCTOR(a, 1.0 / sqrt(g11));
@@ -37,9 +40,9 @@ struct metric_kerr_schild : public metric_base<metric_kerr_schild> {
 
   DEFINE_FUNCTOR(g00, z - 1.0);
   DEFINE_FUNCTOR(g01, z);
-  DEFINE_FUNCTOR(g03, -1.0 * z * m_a * square(sin(_2)));
+  DEFINE_FUNCTOR(g03, -1.0 * z * m_a * square(sin(_theta)));
   DEFINE_FUNCTOR(g10, z);
-  DEFINE_FUNCTOR(g30, -1.0 * z * m_a * square(sin(_2)));
+  DEFINE_FUNCTOR(g30, -1.0 * z * m_a * square(sin(_theta)));
 
   metric_kerr_schild() : m_rg(2.0), m_a(0.0) {}
   metric_kerr_schild(double rg, double a) : m_rg(rg), m_a(a) {}
