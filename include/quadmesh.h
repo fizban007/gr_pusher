@@ -195,9 +195,9 @@ struct Quadmesh {
   HD_INLINE Vec3<Scalar> pos_particle(int cell_linear,
                                       const Vec3<T>& pos_rel) const {
     Vec3<Scalar> pos_full(
-        pos(0, get_c1(cell_linear), pos_rel.x),
-        pos(1, get_c2(cell_linear), pos_rel.y),
-        pos(2, get_c3(cell_linear), pos_rel.z));  // Note deltas cannot be zero,
+        pos(0, get_c1(cell_linear), pos_rel.x / delta[0]),
+        pos(1, get_c2(cell_linear), pos_rel.y / delta[1]),
+        pos(2, get_c3(cell_linear), pos_rel.z / delta[2]));  // Note deltas cannot be zero,
                                                   // even that dimension is
                                                   // absent.
     return pos_full;

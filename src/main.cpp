@@ -4,6 +4,7 @@
 #include "grid.h"
 #include "metrics.h"
 #include "vec3.h"
+#include "utils/timer.h"
 
 using namespace Aperture;
 using namespace fadbad;
@@ -22,11 +23,11 @@ mid_point(const Vec3<Double>& x, const Vec3<double>& x0, int c, int c0,
   Vec3<Double> result{0.0, 0.0, 0.0};
   if (c == c0) {
     c_result = c0;
-    for (int i = 0; i < 3; i++) result[i] = 0.5 * (x[i] + x0[i]);
+    for (int i = 0; i < grid.dim(); i++) result[i] = 0.5 * (x[i] + x0[i]);
   } else {
     auto cell = grid.mesh().get_cell_3d(c);
     auto cell_0 = grid.mesh().get_cell_3d(c0);
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < grid.dim(); i++) {
       result[i] =
           0.5 * (x[i] + x0[i] + (cell_0[i] - cell[i]) * grid.mesh().delta[i]);
       if (result[i] >= grid.mesh().delta[i]) {
@@ -159,10 +160,11 @@ int iterate_newton(Particle& p, const Grid& grid, double dt) {
     p.u[2] -= new_f[5];
     auto new_cell = grid.mesh().get_cell_3d(p.cell);
     for (int j = 0; j < grid.dim(); j++) {
-      if (p.x[j] >= grid.mesh().delta[j]) {
+      while (p.x[j] >= grid.mesh().delta[j]) {
         new_cell[j] += 1;
         p.x[j] -= grid.mesh().delta[j];
-      } else if (p.x[j] < 0.0) {
+      }
+      while (p.x[j] < 0.0) {
         new_cell[j] -= 1;
         p.x[j] += grid.mesh().delta[j];
       }
@@ -178,6 +180,7 @@ int iterate_newton(Particle& p, const Grid& grid, double dt) {
   double u_0 = grid.beta(0, p.cell, p.x) * p.u[0] + grid.beta(1, p.cell, p.x) * p.u[1] + grid.beta(2, p.cell, p.x) * p.u[2] - grid.alpha(p.cell, p.x) * grid.alpha(p.cell, p.x) * Gamma(p.x, p.u, p.cell, grid);
   auto pos = grid.mesh().pos_particle(p.cell, p.x);
   std::cout << pos << " " << pos.x * sin(pos.y) <<  " " << p.u << " " << u_0 << std::endl;
+  // std::cout << p.x << ", " << grid.mesh().get_cell_3d(p.cell) << std::endl;
   return 0;
 }
 
@@ -190,9 +193,13 @@ main(int argc, char* argv[]) {
   // The convention for grid parsing is as follows:
   // Number of cells, Starting coordinate, Total length, Number of guard cells
   Grid grid(
-      {"DIM1 256 1.0 5.00 1", "DIM2 256 0.0 3.14 1", "DIM3 256 0.0 6.28 1"});
-      // {"DIM1 256 1.0 5.00 1", "DIM2 256 0.0 3.14 1", "DIM3 1 0.0 6.28 0"});
+      // {"DIM1 256 1.0 5.00 1", "DIM2 256 0.0 3.14 1", "DIM3 256 0.0 6.28 1"});
+      {"DIM1 1024 1.0 5.00 1", "DIM2 1024 0.0 3.14 1", "DIM3 1 0.0 6.28 0"});
+  std::cout << "Grid dr is " << grid.mesh().delta[0] << std::endl;
+  std::cout << "Grid dtheta is " << grid.mesh().delta[1] << std::endl;
   auto m = metric::metric_spherical();
+  //     {"DIM1 256 0.0 1.00 1", "DIM2 256 0.0 1.00 1", "DIM3 256 0.0 1.00 1"});
+  // auto m = metric::metric_cartesian();
   //     {"DIM1 256 0.0 2.00 1", "DIM2 256 0.0 3.14 1", "DIM3 256 0.0 6.28 1"});
   // auto m = metric::metric_log_spherical();
 
@@ -206,16 +213,19 @@ main(int argc, char* argv[]) {
   ////////////////////////////////////////////////////////////////////////////////
   Particle p;
   // p.cell = 128 + 129 * 258 + 24 * 258 * 258;
-  p.cell = 128 + 129 * 258 + 24 * 258 * 258;
+  // p.cell = 128 + 129 * 258;
+  p.cell = 512 + 513 * 1026;
   p.u[1] = -1.0;
   // p.x[0] = 0.5 * grid.mesh().delta[0];
-  // p.x[1] = 0.5 * grid.mesh().delta[1];
+  p.x[1] = 0.0007944;
   // p.x[2] = 0.5 * grid.mesh().delta[2];
 
   ////////////////////////////////////////////////////////////////////////////////
   ///  Set up iteration
   ////////////////////////////////////////////////////////////////////////////////
   const double dt = 0.01;
+  Particle p_initial = p;
+  timer::stamp();
   for (int n = 0; n < 1000; n++) {
     std::cout << "At timestep " << n << std::endl;
     if (iterate_newton(p, grid, dt) == 1) break;
@@ -224,6 +234,7 @@ main(int argc, char* argv[]) {
       break;
     }
   }
+  timer::show_duration_since_stamp("Evolution time", "ms");
 
   return 0;
 }
