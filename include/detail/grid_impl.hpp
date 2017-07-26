@@ -410,7 +410,7 @@ Grid::setup_metric_f::operator()(const Metric& g, Grid& grid) const {
               }
               // Determinant is also defined at cell faces
               pos[n] += 0.5 * grid.m_mesh.delta[n];
-              grid.m_det[n][idx] = g.det(pos);
+              grid.m_det[n][idx] = sqrt(g.det(pos));
               grid.m_alpha[n][idx] = g.alpha(pos);
               grid.m_beta1[n][idx] = g.beta(n_trans[0] + 1, pos);
               grid.m_beta2[n][idx] = g.beta(n_trans[1] + 1, pos);
@@ -423,7 +423,7 @@ Grid::setup_metric_f::operator()(const Metric& g, Grid& grid) const {
                   // g_mat(n, m) = grid.m_metric[n][m][idx];
                 }
               }
-              grid.m_det[n][idx] = g.det(pos);
+              grid.m_det[n][idx] = sqrt(g.det(pos));
               grid.m_alpha[n][idx] = g.alpha(pos);
               grid.m_beta1[n][idx] = g.beta(n_trans[0] + 1, pos);
               grid.m_beta2[n][idx] = g.beta(n_trans[1] + 1, pos);
