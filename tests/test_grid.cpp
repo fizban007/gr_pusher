@@ -174,3 +174,48 @@ TEST_CASE("Making dual", "[grid]") {
     }
   }
 }
+
+TEST_CASE("Saving and reloading", "[grid]") {
+  Grid g({"DIM1 64 1.0 5.00 2",
+          "DIM2 64 0.0 3.14 2",
+          "DIM3 64 0.0 6.28 2"});
+  g.setup_metric(metric::metric_spherical(), g);
+
+  Grid g2({"DIM1 64 1.0 5.00 2",
+          "DIM2 64 0.0 3.14 2",
+          "DIM3 64 0.0 6.28 2"});
+  g2.setup_metric(metric::metric_spherical(), g2);
+
+  for (int i = 0; i < 3; i++) {
+    REQUIRE(g.mesh().lower[i] == g2.mesh().lower[i]);
+    REQUIRE(g.mesh().sizes[i] == g2.mesh().sizes[i]);
+    REQUIRE(g.mesh().delta[i] == g2.mesh().delta[i]);
+    REQUIRE(g.mesh().guard[i] == g2.mesh().guard[i]);
+    REQUIRE(g.mesh().dims[i] == g2.mesh().dims[i]);
+    REQUIRE(g.mesh().dimension == g2.mesh().dimension);
+    size_t N = g2.mesh().size();
+    for (int n = 0; n < N; n++) {
+      REQUIRE(g.det_array()[i][n] == g2.det_array()[i][n]);
+      REQUIRE(g.alpha_array()[i][n] == g2.alpha_array()[i][n]);
+      REQUIRE(g.beta1_array()[i][n] == g2.beta1_array()[i][n]);
+      REQUIRE(g.beta2_array()[i][n] == g2.beta2_array()[i][n]);
+    }
+    for (int j = 0; j < 3; j++) {
+      REQUIRE(g.metric_mask_array()[i][j] == g2.metric_mask_array()[i][j]);
+      if (g.metric_mask_array()[i][j] == 1) {
+        for (int n = 0; n < N; n++) {
+          REQUIRE(g.metric_array()[i][j][n] == g2.metric_array()[i][j][n]);
+        }
+      }
+    }
+    for (int j = 0; j < 4; j++) {
+      for (int k = 0; k < 4; k++) {
+        REQUIRE(g.conn_mask_array()[i][j][k] == g2.conn_mask_array()[i][j][k]);
+        for (int n = 0; n < N; n++) {
+          if (g.conn_mask_array()[i][j][k] == 1)
+            REQUIRE(g.conn_array()[i][j][k][n] == g2.conn_array()[i][j][k][n]);
+        }
+      }
+    }
+  }
+}
