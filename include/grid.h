@@ -217,11 +217,25 @@ class Grid {
   //   return m_alpha;
   // }
   const std::array<MultiArray<Scalar>, 3>& det_array() const { return m_det; }
+  const std::array<MultiArray<Scalar>, 3>& alpha_array() const { return m_alpha; }
+  const std::array<MultiArray<Scalar>, 3>& beta1_array() const { return m_beta1; }
+  const std::array<MultiArray<Scalar>, 3>& beta2_array() const { return m_beta2; }
+  const std::array<std::array<char, 3>, 3>& metric_mask_array() const {
+    return m_metric_mask;
+  }
   const std::array<std::array<MultiArray<Scalar>, 3>, 3>& metric_array() const {
     return m_metric;
   }
   const std::array<std::vector<MultiArray<Scalar>>, 3>& scales_array() const {
     return m_scales;
+  }
+  const std::array<std::array<std::array<MultiArray<Scalar>, 4>, 4>, 3>&
+  conn_array() const {
+    return m_connection;
+  }
+  const std::array<std::array<std::array<char, 4>, 4>, 3>&
+  conn_mask_array() const {
+    return m_connection_mask;
   }
 
   void save_to_disk();
