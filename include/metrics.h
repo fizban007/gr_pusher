@@ -3,25 +3,26 @@
 
 enum class MetricType : char {
   Cartesian,
-    spherical,
-    log_spherical,
-    Schwarzschild,
-    // log_Schwarzschild,
-    Kerr_Schild,
-    // log_Kerr_Schild,
-    Boyer_Lindquist,
-    log_Boyer_Lindquist
-    // rot_log_Schwarzschild,
-    // rot_Minkowski
-      };
+  spherical,
+  log_spherical,
+  Schwarzschild,
+  // log_Schwarzschild,
+  Kerr_Schild,
+  // log_Kerr_Schild,
+  Boyer_Lindquist,
+  log_Boyer_Lindquist,
+  // rot_log_Schwarzschild,
+  // rot_Minkowski
+  Cart_Kerr_Schild
+};
 
+#include "metrics/metric_boyer_lindquist.h"
 #include "metrics/metric_cartesian.h"
-#include "metrics/metric_spherical.h"
+#include "metrics/metric_kerr_schild.h"
+#include "metrics/metric_log_boyer_lindquist.h"
 #include "metrics/metric_log_spherical.h"
 #include "metrics/metric_schwarzschild.h"
-#include "metrics/metric_kerr_schild.h"
-#include "metrics/metric_boyer_lindquist.h"
-#include "metrics/metric_log_boyer_lindquist.h"
+#include "metrics/metric_spherical.h"
 
 namespace Aperture {
 
@@ -57,15 +58,16 @@ MetricType parse_metric(const std::string& str);
 /// doesn't need to write out a if-else statement each time when
 /// selecting the weight type dynamically.
 template <typename Functor, typename... Args>
-void select_metric(MetricType metric_type, Functor func, Args && ...args) {
+void
+select_metric(MetricType metric_type, Functor func, Args&&... args) {
   if (metric_type == MetricType::Cartesian) {
     func(metric::g_metric_cartesian, std::forward<Args>(args)...);
-  // } else if (metric_type == MetricType::spherical) {
-  //   func(metric::g_metric_spherical, std::forward<Args>(args)...);
+    // } else if (metric_type == MetricType::spherical) {
+    //   func(metric::g_metric_spherical, std::forward<Args>(args)...);
   } else if (metric_type == MetricType::log_spherical) {
     func(metric::g_metric_log_spherical, std::forward<Args>(args)...);
- // } else if (metric_type == MetricType::Schwarzschild) {
-  //   func(metric::g_metric_schwarzschild, std::forward<Args>(args)...);
+    // } else if (metric_type == MetricType::Schwarzschild) {
+    //   func(metric::g_metric_schwarzschild, std::forward<Args>(args)...);
   } else if (metric_type == MetricType::Kerr_Schild) {
     func(metric::g_metric_kerr_schild, std::forward<Args>(args)...);
   } else if (metric_type == MetricType::Boyer_Lindquist) {
@@ -74,8 +76,6 @@ void select_metric(MetricType metric_type, Functor func, Args && ...args) {
     func(metric::g_metric_log_boyer_lindquist, std::forward<Args>(args)...);
   }
 }
-
-
 }
 
 #endif  // _METRICS_H_
