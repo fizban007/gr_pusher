@@ -320,6 +320,13 @@ Grid::load_from_disk() {
   std::ifstream fs;
   fs.open(m_cache_filename.c_str(), std::ios::in | std::ios::binary);
   fs >> m_mesh;
+  for (int i = 0; i < 3; i++) {
+    if (m_mesh.dims[i] > 1) {
+      m_mesh.delta[i] = m_mesh.sizes[i] / m_mesh.reduced_dim(i);
+    } else {
+      m_mesh.delta[i] = m_mesh.sizes[i];
+    }
+  }
   char c;
   fs.get(c);  // hack to get an additional position on fs
   // std::cout << (int)fs.tellg() << std::endl;
