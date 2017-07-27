@@ -104,31 +104,33 @@ TEST_CASE("Alpha and beta", "[grid]") {
   auto _z = rg * _r / _rho2;
   auto _alpha = 1.0 / sqrt(1.0 + _z);
 
-  VectorField<Scalar> beta1_expected(g);
-  VectorField<Scalar> beta2_expected(g);
-  VectorField<Scalar> alpha_expected(g);
-  beta1_expected.initialize(2, _z / (1.0 + _z));
-  beta2_expected.initialize(1, _z / (1.0 + _z));
-  alpha_expected.initialize(0, _alpha);
-  alpha_expected.initialize(1, _alpha);
-  alpha_expected.initialize(2, _alpha);
+  VectorField<Scalar> beta_expected(g);
+  // VectorField<Scalar> beta2_expected(g);
+  ScalarField<Scalar> alpha_expected(g);
+  beta_expected.initialize(0, _z / (1.0 + _z));
+  // beta2_expected.initialize(1, _z / (1.0 + _z));
+  alpha_expected.initialize(_alpha);
+  // alpha_expected.initialize(1, _alpha);
+  // alpha_expected.initialize(2, _alpha);
   for (int j = 1; j < 67; j++) {
     for (int i = 1; i < 67; i++) {
       Approx target = Approx(0.0).margin(1.0e-5);
-      REQUIRE(g.beta1(2, i, j) - beta1_expected(2, i, j) == target);
-      REQUIRE(g.beta2(1, i, j) - beta2_expected(1, i, j) == target);
-      REQUIRE(g.alpha(0, i, j) - alpha_expected(0, i, j) == target);
-      REQUIRE(g.alpha(1, i, j) - alpha_expected(1, i, j) == target);
-      REQUIRE(g.alpha(2, i, j) - alpha_expected(2, i, j) == target);
+      REQUIRE(g.beta_mask_array()[0] == 1);
+      std::cout << "(" << i << ", " << j << ")" << std::endl;
+      REQUIRE(g.beta_array()[0](i, j) == Approx(beta_expected(0, i, j)).margin(1.0e-5));
+      // REQUIRE(g.beta2(1, i, j) - beta2_expected(1, i, j) == target);
+      REQUIRE(g.alpha(i, j) - alpha_expected(i, j) == target);
+      // REQUIRE(g.alpha(1, i, j) - alpha_expected(1, i, j) == target);
+      // REQUIRE(g.alpha(2, i, j) - alpha_expected(2, i, j) == target);
     }
   }
 
-  REQUIRE(g.beta1_mask(1) == true);
-  REQUIRE(g.beta2_mask(2) == true);
-  REQUIRE(g.beta1_mask(0) == false);
-  REQUIRE(g.beta2_mask(1) == false);
-  REQUIRE(g.beta1_mask(2) == false);
-  REQUIRE(g.beta2_mask(0) == false);
+  REQUIRE(g.beta_mask(0) == true);
+  // REQUIRE(g.beta2_mask(2) == true);
+  // REQUIRE(g.beta1_mask(0) == false);
+  // REQUIRE(g.beta2_mask(1) == false);
+  // REQUIRE(g.beta1_mask(2) == false);
+  // REQUIRE(g.beta2_mask(0) == false);
 }
 
 TEST_CASE("Spherical alpha", "[grid]") {
@@ -140,7 +142,7 @@ TEST_CASE("Spherical alpha", "[grid]") {
 
   for (int j = 1; j < 67; j++) {
     for (int i = 1; i < 67; i++) {
-      REQUIRE(g.alpha(0, i, j) == Approx(1.0));
+      REQUIRE(g.alpha(i, j) == Approx(1.0));
       REQUIRE(g.alpha(i + j * 68, Vec3<double>(0.2 * g.mesh().delta[0],0.3 * g.mesh().delta[1],0.0)) == Approx(1.0));
     }
   }
@@ -185,7 +187,12 @@ TEST_CASE("Saving and reloading", "[grid]") {
           "DIM2 64 0.0 3.14 2",
           "DIM3 64 0.0 6.28 2"});
   g2.setup_metric(metric::metric_spherical(), g2);
+  size_t N = g2.mesh().size();
 
+  for (int n = 0; n < N; n++) {
+    REQUIRE(g.det_array()[n] == g2.det_array()[n]);
+    REQUIRE(g.alpha_array()[n] == g2.alpha_array()[n]);
+  }
   for (int i = 0; i < 3; i++) {
     REQUIRE(g.mesh().lower[i] == g2.mesh().lower[i]);
     REQUIRE(g.mesh().sizes[i] == g2.mesh().sizes[i]);
@@ -193,12 +200,11 @@ TEST_CASE("Saving and reloading", "[grid]") {
     REQUIRE(g.mesh().guard[i] == g2.mesh().guard[i]);
     REQUIRE(g.mesh().dims[i] == g2.mesh().dims[i]);
     REQUIRE(g.mesh().dimension == g2.mesh().dimension);
-    size_t N = g2.mesh().size();
-    for (int n = 0; n < N; n++) {
-      REQUIRE(g.det_array()[i][n] == g2.det_array()[i][n]);
-      REQUIRE(g.alpha_array()[i][n] == g2.alpha_array()[i][n]);
-      REQUIRE(g.beta1_array()[i][n] == g2.beta1_array()[i][n]);
-      REQUIRE(g.beta2_array()[i][n] == g2.beta2_array()[i][n]);
+    if (g.beta_mask_array()[i] == 1) {
+      for (int n = 0; n < N; n++) {
+        REQUIRE(g.beta_array()[i][n] == g2.beta_array()[i][n]);
+        // REQUIRE(g.beta2_array()[i][n] == g2.beta2_array()[i][n]);
+      }
     }
     for (int j = 0; j < 3; j++) {
       REQUIRE(g.metric_mask_array()[i][j] == g2.metric_mask_array()[i][j]);

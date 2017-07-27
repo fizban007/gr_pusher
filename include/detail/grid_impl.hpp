@@ -333,12 +333,12 @@ Grid::setup_metric_f::operator()(const Metric& g, Grid& grid) const {
   // Allocate det, alpha, and beta arrays
   grid.allocate_arrays();
   // Mask the corresponding beta array
-  if (g.b1 != CudaLE::ZeroOp())
-    grid.m_beta1_mask[1] = grid.m_beta2_mask[2] = true;
-  if (g.b2 != CudaLE::ZeroOp())
-    grid.m_beta1_mask[2] = grid.m_beta2_mask[0] = true;
-  if (g.b3 != CudaLE::ZeroOp())
-    grid.m_beta1_mask[0] = grid.m_beta2_mask[1] = true;
+  // if (g.b1 != CudaLE::ZeroOp())
+  //   grid.m_beta1_mask[1] = grid.m_beta2_mask[2] = true;
+  // if (g.b2 != CudaLE::ZeroOp())
+  //   grid.m_beta1_mask[2] = grid.m_beta2_mask[0] = true;
+  // if (g.b3 != CudaLE::ZeroOp())
+  //   grid.m_beta1_mask[0] = grid.m_beta2_mask[1] = true;
 
   // Resize the metric arrays, always do the diagonal
   grid.m_metric[0][0].resize(grid.m_mesh.extent());
@@ -361,6 +361,10 @@ Grid::setup_metric_f::operator()(const Metric& g, Grid& grid) const {
     grid.m_metric[2][1].resize(grid.m_mesh.extent());
     grid.m_metric_mask[1][2] = grid.m_metric_mask[2][1] = 1;
   }
+
+  if (g.b1 != CudaLE::ZeroOp()) grid.m_beta_mask[0] = 1;
+  if (g.b2 != CudaLE::ZeroOp()) grid.m_beta_mask[1] = 1;
+  if (g.b3 != CudaLE::ZeroOp()) grid.m_beta_mask[2] = 1;
 
   for (int i = 0; i < 3; i++) {
     for (int j = 0; j < 3; j++) {
@@ -399,7 +403,7 @@ Grid::setup_metric_f::operator()(const Metric& g, Grid& grid) const {
           int idx = grid.m_mesh.get_idx(i, j, k);
           // Eigen::Matrix3d g_mat = Eigen::Matrix3d::Zero();
           for (int n = 0; n < 3; n++) {
-            int n_trans[2] = {(n + 1) % 3, (n + 2) % 3};
+            // int n_trans[2] = {(n + 1) % 3, (n + 2) % 3};
             if (n < grid.m_mesh.dim()) {
               // We define metric coefficients at face centers with respect to the
               // first index
@@ -409,12 +413,13 @@ Grid::setup_metric_f::operator()(const Metric& g, Grid& grid) const {
                 }
               }
               // Determinant is also defined at cell faces
-              pos[n] += 0.5 * grid.m_mesh.delta[n];
-              grid.m_det[n][idx] = sqrt(g.det(pos));
-              grid.m_alpha[n][idx] = g.alpha(pos);
-              grid.m_beta1[n][idx] = g.beta(n_trans[0] + 1, pos);
-              grid.m_beta2[n][idx] = g.beta(n_trans[1] + 1, pos);
-              pos[n] -= 0.5 * grid.m_mesh.delta[n];
+              // pos[n] += 0.5 * grid.m_mesh.delta[n];
+              grid.m_det[idx] = sqrt(g.det(pos));
+              grid.m_alpha[idx] = g.alpha(pos);
+              if (grid.m_beta_mask[n] == 1)
+                grid.m_beta[n][idx] = g.beta(n, pos);
+              // grid.m_beta2[n][idx] = g.beta(n_trans[1] + 1, pos);
+              // pos[n] -= 0.5 * grid.m_mesh.delta[n];
             } else {
               for (int m = 0; m < 3; m++) {
                 // metric coefficients are defined at the grid centers
@@ -423,10 +428,11 @@ Grid::setup_metric_f::operator()(const Metric& g, Grid& grid) const {
                   // g_mat(n, m) = grid.m_metric[n][m][idx];
                 }
               }
-              grid.m_det[n][idx] = sqrt(g.det(pos));
-              grid.m_alpha[n][idx] = g.alpha(pos);
-              grid.m_beta1[n][idx] = g.beta(n_trans[0] + 1, pos);
-              grid.m_beta2[n][idx] = g.beta(n_trans[1] + 1, pos);
+              grid.m_det[idx] = sqrt(g.det(pos));
+              grid.m_alpha[idx] = g.alpha(pos);
+              if (grid.m_beta_mask[n] == 1)
+                grid.m_beta[n][idx] = g.beta(n, pos);
+              // grid.m_beta2[n][idx] = g.beta(n_trans[1] + 1, pos);
             }
           }
           // Eigen::Matrix3d g_inv = g_mat.inverse();
@@ -806,7 +812,7 @@ Grid::det(int cell, const Double& x1, const Double& x2, const Double& x3) const 
   for (int k = lower[2]; k <= upper[2]; k++) {
     for (int j = lower[1]; j <= upper[1]; j++) {
       for (int i = lower[0]; i <= upper[0]; i++) {
-        result += m_det[0](i, j, k) * interp_cell(x1, i - c[0], m_mesh.delta[0], 1)
+        result += m_det(i, j, k) * interp_cell(x1, i - c[0], m_mesh.delta[0], 0)
                   * interp_cell(x2, j - c[1], m_mesh.delta[1], 0)
                   * (dim() < 3 ? 1.0 : interp_cell(x3, k - c[2], m_mesh.delta[2], 0));
       }
@@ -829,7 +835,7 @@ Grid::alpha(int cell, const Double& x1, const Double& x2, const Double& x3) cons
   for (int k = lower[2]; k <= upper[2]; k++) {
     for (int j = lower[1]; j <= upper[1]; j++) {
       for (int i = lower[0]; i <= upper[0]; i++) {
-        result += m_alpha[0](i, j, k) * interp_cell(x1, i - c[0], m_mesh.delta[0], 1)
+        result += m_alpha(i, j, k) * interp_cell(x1, i - c[0], m_mesh.delta[0], 0)
                   * interp_cell(x2, j - c[1], m_mesh.delta[1], 0)
                   * (dim() < 3 ? 1.0 : interp_cell(x3, k - c[2], m_mesh.delta[2], 0));
       }
@@ -853,33 +859,33 @@ Grid::beta(int n, int cell, const Double& x1, const Double& x2, const Double& x3
     for (int j = lower[1]; j <= upper[1]; j++) {
       for (int i = lower[0]; i <= upper[0]; i++) {
         if (dim() < 3) {
-          if (n == 0)
-            result += m_beta2[1](i, j, k) * interp_cell(x1, i - c[0], m_mesh.delta[0], 0)
-                       * interp_cell(x2, j - c[1], m_mesh.delta[1], 1);
-          else if (n == 1)
-            result += m_beta1[0](i, j, k) * interp_cell(x1, i - c[0], m_mesh.delta[0], 1)
+          // if (n == 0)
+          result += m_beta[n](i, j, k) * interp_cell(x1, i - c[0], m_mesh.delta[0], 0)
                       * interp_cell(x2, j - c[1], m_mesh.delta[1], 0);
-          else if (n == 2)
-            result += m_beta2[0](i, j, k) * interp_cell(x1, i - c[0], m_mesh.delta[0], 1)
-                      * interp_cell(x2, j - c[1], m_mesh.delta[1], 0);
+          // else if (n == 1)
+          //   result += m_beta1[0](i, j, k) * interp_cell(x1, i - c[0], m_mesh.delta[0], 1)
+          //             * interp_cell(x2, j - c[1], m_mesh.delta[1], 0);
+          // else if (n == 2)
+          //   result += m_beta2[0](i, j, k) * interp_cell(x1, i - c[0], m_mesh.delta[0], 1)
+          //             * interp_cell(x2, j - c[1], m_mesh.delta[1], 0);
         } else {
-          if (n == 0)
-            result += m_beta1[2](i, j, k) * interp_cell(x1, i - c[0], m_mesh.delta[0], 0)
-                      * interp_cell(x2, j - c[1], m_mesh.delta[1], 0)
-                      * interp_cell(x3, k - c[2], m_mesh.delta[2], 1);
+          // if (n == 0)
+          result += m_beta[n](i, j, k) * interp_cell(x1, i - c[0], m_mesh.delta[0], 0)
+                    * interp_cell(x2, j - c[1], m_mesh.delta[1], 0)
+                    * interp_cell(x3, k - c[2], m_mesh.delta[2], 0);
                        // * interp.interp_cell(rel_pos[2], c[2], k, 1);
-          else if (n == 1)
-            result += m_beta1[0](i, j, k) * interp_cell(x1, i - c[0], m_mesh.delta[0], 1)
-                      * interp_cell(x2, j - c[1], m_mesh.delta[1], 0)
-                      * interp_cell(x3, k - c[2], m_mesh.delta[2], 0);
-                       // * interp.interp_cell(rel_pos[1], c[1], j, 0)
-                       // * interp.interp_cell(rel_pos[2], c[2], k, 0);
-          else if (n == 2)
-            result += m_beta1[1](i, j, k) * interp_cell(x1, i - c[0], m_mesh.delta[0], 0)
-                      * interp_cell(x2, j - c[1], m_mesh.delta[1], 1)
-                      * interp_cell(x3, k - c[2], m_mesh.delta[2], 0);
-                       // * interp.interp_cell(rel_pos[1], c[1], j, 1)
-                       // * interp.interp_cell(rel_pos[2], c[2], k, 0);
+          // else if (n == 1)
+          //   result += m_beta1[0](i, j, k) * interp_cell(x1, i - c[0], m_mesh.delta[0], 1)
+          //             * interp_cell(x2, j - c[1], m_mesh.delta[1], 0)
+          //             * interp_cell(x3, k - c[2], m_mesh.delta[2], 0);
+          //              // * interp.interp_cell(rel_pos[1], c[1], j, 0)
+          //              // * interp.interp_cell(rel_pos[2], c[2], k, 0);
+          // else if (n == 2)
+          //   result += m_beta1[1](i, j, k) * interp_cell(x1, i - c[0], m_mesh.delta[0], 0)
+          //             * interp_cell(x2, j - c[1], m_mesh.delta[1], 1)
+          //             * interp_cell(x3, k - c[2], m_mesh.delta[2], 0);
+          //              // * interp.interp_cell(rel_pos[1], c[1], j, 1)
+          //              // * interp.interp_cell(rel_pos[2], c[2], k, 0);
         }
       }
     }

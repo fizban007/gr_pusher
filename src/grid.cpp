@@ -17,15 +17,15 @@ Grid::~Grid() {}
 Grid::Grid(int N1, int N2, int N3)
     : m_mesh(N1, N2, N3),
       m_grid_hash(0),
-      m_beta1_mask{},
-      m_beta2_mask{},
+      m_beta_mask{0, 0, 0},
+      // m_beta2_mask{},
       m_metric_mask{} {
   // allocate_arrays();
 }
 // , m_connection_mask{} {}
 
 Grid::Grid(const std::array<std::string, 3>& config)
-    : m_beta1_mask{}, m_beta2_mask{}, m_metric_mask{} {
+    : m_beta_mask{}, m_metric_mask{} {
   parse(config);
 }
 // m_connection_mask{} { parse(config); }
@@ -34,23 +34,21 @@ Grid::Grid(const Grid& g) {
   m_mesh = g.m_mesh;
   m_grid_hash = g.m_grid_hash;
   m_cache_filename = g.m_cache_filename;
+  m_alpha = g.m_alpha;
+  m_det = g.m_det;
   for (int i = 0; i < 3; i++) {
     // m_cell_face_area[i] = g.m_cell_face_area[i];
     // m_cell_edge_length[i] = g.m_cell_edge_length[i];
-    m_alpha[i] = g.m_alpha[i];
-    m_beta1[i] = g.m_beta1[i];
-    m_beta2[i] = g.m_beta2[i];
-    m_beta1_mask[i] = g.m_beta1_mask[i];
-    m_beta2_mask[i] = g.m_beta2_mask[i];
-    m_det[i] = g.m_det[i];
+    m_beta[i] = g.m_beta[i];
+    m_beta_mask[i] = g.m_beta_mask[i];
     for (unsigned int j = 0; j < 3; j++) {
       m_metric[i][j] = g.m_metric[i][j];
       m_inv_metric[i][j] = g.m_inv_metric[i][j];
       m_metric_mask[i][j] = g.m_metric_mask[i][j];
-      // for (unsigned int k = 0; k < 3; k++) {
-      //   m_connection[i][j][k] = g.m_connection[i][j][k];
-      //   m_connection_mask[i][j][k] = g.m_connection_mask[i][j][k];
-      // }
+      for (unsigned int k = 0; k < 3; k++) {
+        m_connection[i][j][k] = g.m_connection[i][j][k];
+        m_connection_mask[i][j][k] = g.m_connection_mask[i][j][k];
+      }
     }
   }
 }
@@ -58,17 +56,17 @@ Grid::Grid(const Grid& g) {
 Grid::Grid(Grid&& g)
     : // m_cell_face_area(std::move(g.m_cell_face_area)),
       m_alpha(std::move(g.m_alpha)),
-      m_beta1(std::move(g.m_beta1)),
-      m_beta2(std::move(g.m_beta2)),
-      m_beta1_mask(std::move(g.m_beta1_mask)),
-      m_beta2_mask(std::move(g.m_beta2_mask)),
+      // m_beta1(std::move(g.m_beta1)),
+      m_beta(std::move(g.m_beta)),
+      m_beta_mask(std::move(g.m_beta_mask)),
+      // m_beta2_mask(std::move(g.m_beta2_mask)),
       // m_cell_edge_length(std::move(g.m_cell_edge_length)),
       m_det(std::move(g.m_det)),
       m_metric(std::move(g.m_metric)),
       m_inv_metric(std::move(g.m_inv_metric)),
-      m_metric_mask(std::move(g.m_metric_mask)) {
-  // m_connection(std::move(g.m_connection)),
-  // m_connection_mask(std::move(g.m_connection_mask)) {
+      m_metric_mask(std::move(g.m_metric_mask)),
+      m_connection(std::move(g.m_connection)),
+      m_connection_mask(std::move(g.m_connection_mask)) {
   m_mesh = g.m_mesh;
   m_grid_hash = g.m_grid_hash;
   m_cache_filename = g.m_cache_filename;
@@ -80,15 +78,15 @@ Grid::operator=(const Grid& g) {
   m_mesh = g.m_mesh;
   m_grid_hash = g.m_grid_hash;
   m_cache_filename = g.m_cache_filename;
+  m_alpha = g.m_alpha;
+  m_det = g.m_det;
   for (int i = 0; i < 3; i++) {
     // m_cell_face_area[i] = g.m_cell_face_area[i];
     // m_cell_edge_length[i] = g.m_cell_edge_length[i];
-    m_alpha[i] = g.m_alpha[i];
-    m_beta1[i] = g.m_beta1[i];
-    m_beta2[i] = g.m_beta2[i];
-    m_beta1_mask[i] = g.m_beta1_mask[i];
-    m_beta2_mask[i] = g.m_beta2_mask[i];
-    m_det[i] = g.m_det[i];
+    m_beta[i] = g.m_beta[i];
+    m_beta_mask[i] = g.m_beta_mask[i];
+    // m_beta2[i] = g.m_beta2[i];
+    // m_beta2_mask[i] = g.m_beta2_mask[i];
     for (unsigned int j = 0; j < 3; j++) {
       m_metric[i][j] = g.m_metric[i][j];
       m_inv_metric[i][j] = g.m_inv_metric[i][j];
@@ -110,15 +108,13 @@ Grid::operator=(Grid&& g) {
   // m_cell_face_area = std::move(g.m_cell_face_area);
   // m_cell_edge_length = std::move(g.m_cell_edge_length);
   m_alpha = std::move(g.m_alpha);
-  m_beta1 = std::move(g.m_beta1);
-  m_beta2 = std::move(g.m_beta2);
-  m_beta1_mask = std::move(g.m_beta1_mask);
-  m_beta2_mask = std::move(g.m_beta2_mask);
+  m_beta = std::move(g.m_beta);
+  m_beta_mask = std::move(g.m_beta_mask);
   m_metric = std::move(g.m_metric);
   m_inv_metric = std::move(g.m_inv_metric);
   m_metric_mask = std::move(g.m_metric_mask);
-  // m_connection = std::move(g.m_connection);
-  // m_connection_mask = std::move(g.m_connection_mask);
+  m_connection = std::move(g.m_connection);
+  m_connection_mask = std::move(g.m_connection_mask);
   m_det = std::move(g.m_det);
   // std::cout << "In move assignment!" << std::endl;
   return *this;
@@ -169,7 +165,7 @@ Grid::min_resolved_length(int cell) const {
 // direction is not symmetric or not a killing vector. What do?
 Scalar
 Grid::cell_volume(int cell) const {
-  return m_det[2][cell] * m_mesh.delta[0] * m_mesh.delta[1] *
+  return m_det[cell] * m_mesh.delta[0] * m_mesh.delta[1] *
          (dim() > 2 ? m_mesh.delta[2] : 1.0);
 }
 
@@ -285,15 +281,16 @@ Grid::save_to_disk() {
   std::ofstream fs;
   fs.open(m_cache_filename.c_str(), std::ios::out | std::ios::binary);
   fs << m_mesh;
+  fs.write((char*)m_alpha.data(), m_mesh.size() * sizeof(Scalar));
+  fs.write((char*)m_det.data(), m_mesh.size() * sizeof(Scalar));
   for (int i = 0; i < 3; i++) {
     // fs.write((char*)m_cell_edge_length[i].data(),
     //          m_mesh.size() * sizeof(Scalar));
     // fs.write((char*)m_cell_face_area[i].data(), m_mesh.size() * sizeof(Scalar));
-    fs.write((char*)m_alpha[i].data(), m_mesh.size() * sizeof(Scalar));
-    fs.write((char*)m_beta1[i].data(), m_mesh.size() * sizeof(Scalar));
-    fs.write((char*)m_beta2[i].data(), m_mesh.size() * sizeof(Scalar));
+    fs.write(&m_beta_mask[i], sizeof(char));
+    if (m_beta_mask[i] == 1)
+      fs.write((char*)m_beta[i].data(), m_mesh.size() * sizeof(Scalar));
     // fs.write((char*)m_norm[i].data(), m_mesh.size() * sizeof(Scalar));
-    fs.write((char*)m_det[i].data(), m_mesh.size() * sizeof(Scalar));
     for (int j = 0; j < 3; j++) {
       fs.write(&m_metric_mask[i][j], sizeof(char));
       if (m_metric_mask[i][j] == 1)
@@ -330,15 +327,19 @@ Grid::load_from_disk() {
   char c;
   fs.get(c);  // hack to get an additional position on fs
   // std::cout << (int)fs.tellg() << std::endl;
+  fs.read((char*)m_alpha.data(), m_mesh.size() * sizeof(Scalar));
+  fs.read((char*)m_det.data(), m_mesh.size() * sizeof(Scalar));
   for (int i = 0; i < 3; i++) {
     // fs.read((char*)m_cell_edge_length[i].data(),
     //         m_mesh.size() * sizeof(Scalar));
     // fs.read((char*)m_cell_face_area[i].data(), m_mesh.size() * sizeof(Scalar));
-    fs.read((char*)m_alpha[i].data(), m_mesh.size() * sizeof(Scalar));
-    fs.read((char*)m_beta1[i].data(), m_mesh.size() * sizeof(Scalar));
-    fs.read((char*)m_beta2[i].data(), m_mesh.size() * sizeof(Scalar));
+    // fs.read((char*)m_alpha[i].data(), m_mesh.size() * sizeof(Scalar));
+    fs.read(&m_beta_mask[i], sizeof(char));
+    if (m_beta_mask[i] == 1)
+      fs.read((char*)m_beta[i].data(), m_mesh.size() * sizeof(Scalar));
+    // fs.read((char*)m_beta2[i].data(), m_mesh.size() * sizeof(Scalar));
     // fs.read((char*)m_norm[i].data(), m_mesh.size() * sizeof(Scalar));
-    fs.read((char*)m_det[i].data(), m_mesh.size() * sizeof(Scalar));
+    // fs.read((char*)m_det[i].data(), m_mesh.size() * sizeof(Scalar));
     for (int j = 0; j < 3; j++) {
       fs.read(&m_metric_mask[i][j], sizeof(char));
       if (m_metric_mask[i][j] == 1)
@@ -372,12 +373,11 @@ Grid::scales(int n, Stagger_t stagger) const {
 
 void
 Grid::allocate_arrays() {
+  m_det.resize(m_mesh.extent());
+  m_alpha.resize(m_mesh.extent());
   for (int i = 0; i < 3; i++) {
     // m_cell_face_area[i].resize(m_mesh.extent());
-    m_det[i].resize(m_mesh.extent());
-    m_alpha[i].resize(m_mesh.extent());
-    m_beta1[i].resize(m_mesh.extent());
-    m_beta2[i].resize(m_mesh.extent());
+    m_beta[i].resize(m_mesh.extent());
   }
 }
 

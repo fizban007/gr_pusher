@@ -70,8 +70,8 @@ class Grid {
     return m_metric[n][m](c1, c2, c3);
   }
   bool metric_mask(int n, int m) const { return m_metric_mask[n][m]; }
-  bool beta1_mask(int n) const { return m_beta1_mask[n]; }
-  bool beta2_mask(int n) const { return m_beta2_mask[n]; }
+  bool beta_mask(int n) const { return m_beta_mask[n]; }
+  // bool beta2_mask(int n) const { return m_beta2_mask[n]; }
   bool conn_mask(int n, int u, int v) const { return m_connection_mask[n][u][v] == 1; }
 
   // Scalar metric(int n, int m, const Vec3<Scalar>& global_pos,
@@ -108,14 +108,14 @@ class Grid {
   Scalar min_resolved_length(int cell) const;
   Scalar cell_volume(int cell) const;
 
-  Scalar alpha(int n, int cell) const { return m_alpha[n][cell]; }
+  Scalar alpha(int cell) const { return m_alpha[cell]; }
   // template <typename POS_T>
   // Scalar alpha(int cell, const Vec3<POS_T>& rel_pos) const;
   template <typename POS_T>
   Scalar alpha(const Vec3<POS_T>& pos) const;
 
-  Scalar beta1(int n, int cell) const { return m_beta1[n][cell]; }
-  Scalar beta2(int n, int cell) const { return m_beta2[n][cell]; }
+  Scalar beta(int n, int cell) const { return m_beta[n][cell]; }
+  // Scalar beta2(int n, int cell) const { return m_beta2[n][cell]; }
   // Vector3 beta(int cell, const Vec3<Pos_t>& rel_pos) const;
   // Vector3 beta(const Vec3<Scalar>& pos) const;
 
@@ -145,7 +145,7 @@ class Grid {
   template <typename Double>
   Double connection(int i, int u, int v, int cell, const Vec3<Double>& x) const;
 
-  Scalar det(int n, int cell) const { return m_det[n][cell]; }
+  Scalar det(int cell) const { return m_det[cell]; }
   // template <typename Pos_t>
   // Scalar det(int cell, const Vec3<Pos_t>& rel_pos) const;
   // template <typename Pos_t>
@@ -167,17 +167,17 @@ class Grid {
     return m_connection[i][a][u](c1, c2, c3);
   }
 
-  Scalar alpha(int n, int c1, int c2, int c3 = 0) const {
-    return m_alpha[n](c1, c2, c3);
+  Scalar alpha(int c1, int c2, int c3 = 0) const {
+    return m_alpha(c1, c2, c3);
   }
-  Scalar beta1(int n, int c1, int c2, int c3 = 0) const {
-    return m_beta1[n](c1, c2, c3);
+  Scalar beta(int n, int c1, int c2, int c3 = 0) const {
+    return m_beta[n](c1, c2, c3);
   }
-  Scalar beta2(int n, int c1, int c2, int c3 = 0) const {
-    return m_beta2[n](c1, c2, c3);
-  }
-  Scalar det(int n, int c1, int c2, int c3 = 0) const {
-    return m_det[n](c1, c2, c3);
+  // Scalar beta2(int n, int c1, int c2, int c3 = 0) const {
+  //   return m_beta2[n](c1, c2, c3);
+  // }
+  Scalar det(int c1, int c2, int c3 = 0) const {
+    return m_det(c1, c2, c3);
   }
 
   Grid make_dual(bool inverse = false) const;
@@ -216,10 +216,10 @@ class Grid {
   // const std::array<multi_array<Scalar>, 3>& alpha_array() const {
   //   return m_alpha;
   // }
-  const std::array<MultiArray<Scalar>, 3>& det_array() const { return m_det; }
-  const std::array<MultiArray<Scalar>, 3>& alpha_array() const { return m_alpha; }
-  const std::array<MultiArray<Scalar>, 3>& beta1_array() const { return m_beta1; }
-  const std::array<MultiArray<Scalar>, 3>& beta2_array() const { return m_beta2; }
+  const MultiArray<Scalar>& det_array() const { return m_det; }
+  const MultiArray<Scalar>& alpha_array() const { return m_alpha; }
+  const std::array<MultiArray<Scalar>, 3>& beta_array() const { return m_beta; }
+  const std::array<char, 3>& beta_mask_array() const { return m_beta_mask; }
   const std::array<std::array<char, 3>, 3>& metric_mask_array() const {
     return m_metric_mask;
   }
@@ -259,15 +259,13 @@ class Grid {
 
   // alpha and beta are defined on face-centered positions
   // std::array<MultiArray<Scalar>, 3> m_cell_face_area;
-  std::array<MultiArray<Scalar>, 3> m_alpha;
+  MultiArray<Scalar> m_alpha;
   // We only define two components of beta because we only need two transverse
   // components of beta at every cell face
-  std::array<MultiArray<Scalar>, 3> m_beta1;
-  std::array<MultiArray<Scalar>, 3> m_beta2;
-  std::array<bool, 3> m_beta1_mask;
-  std::array<bool, 3> m_beta2_mask;
+  std::array<MultiArray<Scalar>, 3> m_beta;
+  std::array<char, 3> m_beta_mask;
   // std::array<multi_array<Scalar>, 3> m_cell_edge_length;
-  std::array<MultiArray<Scalar>, 3> m_det;
+  MultiArray<Scalar> m_det;
 
   // TODO: work out the stagger of the metric tensor
   std::array<std::array<MultiArray<Scalar>, 3>, 3> m_metric;
