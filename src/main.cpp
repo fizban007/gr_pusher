@@ -8,6 +8,7 @@
 #include <Eigen/Dense>
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 
 using namespace Aperture;
 using namespace fadbad;
@@ -424,6 +425,7 @@ main(int argc, char* argv[]) {
     auto pos = grid.mesh().pos_particle(p.cell, p.x);
     std::cout << pos << " " << pos.x * sin(pos.y) << " " << p.u << " " << u_0
               << std::endl;
+    out << std::setprecision( std::numeric_limits<double>::digits10+2 );
     out << pos.x << ", " << pos.y << ", " << pos.z << ", " << u_0 << std::endl;
 
     // TODO: Boundary condition for particles
