@@ -105,6 +105,9 @@ TEST_CASE("Alpha and beta", "[grid]") {
   auto _alpha = 1.0 / sqrt(1.0 + _z);
 
   VectorField<Scalar> beta_expected(g);
+  beta_expected.set_stagger(0, Stagger_t("000"));
+  beta_expected.set_stagger(1, Stagger_t("000"));
+  beta_expected.set_stagger(2, Stagger_t("000"));
   // VectorField<Scalar> beta2_expected(g);
   ScalarField<Scalar> alpha_expected(g);
   beta_expected.initialize(0, _z / (1.0 + _z));
