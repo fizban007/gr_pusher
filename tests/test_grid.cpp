@@ -116,7 +116,9 @@ TEST_CASE("Alpha and beta", "[grid]") {
     for (int i = 1; i < 67; i++) {
       Approx target = Approx(0.0).margin(1.0e-5);
       REQUIRE(g.beta_mask_array()[0] == 1);
-      std::cout << "(" << i << ", " << j << ")" << std::endl;
+      REQUIRE(g.beta_mask_array()[1] == 0);
+      REQUIRE(g.beta_mask_array()[2] == 0);
+      // std::cout << "(" << i << ", " << j << ") " << g.beta_array()[0](i, j) << std::endl;
       REQUIRE(g.beta_array()[0](i, j) == Approx(beta_expected(0, i, j)).margin(1.0e-5));
       // REQUIRE(g.beta2(1, i, j) - beta2_expected(1, i, j) == target);
       REQUIRE(g.alpha(i, j) - alpha_expected(i, j) == target);

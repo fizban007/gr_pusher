@@ -417,7 +417,7 @@ Grid::setup_metric_f::operator()(const Metric& g, Grid& grid) const {
               grid.m_det[idx] = sqrt(g.det(pos));
               grid.m_alpha[idx] = g.alpha(pos);
               if (grid.m_beta_mask[n] == 1)
-                grid.m_beta[n][idx] = g.beta(n, pos);
+                grid.m_beta[n][idx] = g.beta(n + 1, pos);
               // grid.m_beta2[n][idx] = g.beta(n_trans[1] + 1, pos);
               // pos[n] -= 0.5 * grid.m_mesh.delta[n];
             } else {
@@ -431,7 +431,7 @@ Grid::setup_metric_f::operator()(const Metric& g, Grid& grid) const {
               grid.m_det[idx] = sqrt(g.det(pos));
               grid.m_alpha[idx] = g.alpha(pos);
               if (grid.m_beta_mask[n] == 1)
-                grid.m_beta[n][idx] = g.beta(n, pos);
+                grid.m_beta[n][idx] = g.beta(n + 1, pos);
               // grid.m_beta2[n][idx] = g.beta(n_trans[1] + 1, pos);
             }
           }
