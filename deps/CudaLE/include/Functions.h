@@ -10,7 +10,8 @@ namespace CudaLE {
 
 struct Sin
 {
-  HD_INLINE static double apply(double x) {
+  template <typename Data>
+  HD_INLINE static auto apply(const Data& x) {
     return sin(x);
   }
 
@@ -20,13 +21,14 @@ struct Sin
 };
 
 template <typename Arg>
-HD_INLINE UnaryOp<Sin, Arg> sin(Arg arg) {
+HD_INLINE UnaryOp<Sin, Arg> sin(const Arg& arg) {
   return UnaryOp<Sin, Arg>(arg);
 }
 
 struct Cos
 {
-  HD_INLINE static double apply(double x) {
+  template <typename Data>
+  HD_INLINE static auto apply(const Data& x) {
     return cos(x);
   }
 
@@ -36,13 +38,14 @@ struct Cos
 };
 
 template <typename Arg>
-HD_INLINE UnaryOp<Cos, Arg> cos(Arg arg) {
+HD_INLINE UnaryOp<Cos, Arg> cos(const Arg& arg) {
   return UnaryOp<Cos, Arg>(arg);
 }
 
 struct Exp
 {
-  HD_INLINE static double apply(double x) {
+  template <typename Data>
+  HD_INLINE static auto apply(const Data& x) {
     return exp(x);
   }
 
@@ -52,13 +55,14 @@ struct Exp
 };
 
 template <typename Arg>
-HD_INLINE UnaryOp<Exp, Arg> exp(Arg arg) {
+HD_INLINE UnaryOp<Exp, Arg> exp(const Arg& arg) {
   return UnaryOp<Exp, Arg>(arg);
 }
 
 struct Log
 {
-  HD_INLINE static double apply(double x) {
+  template <typename Data>
+  HD_INLINE static auto apply(const Data& x) {
     return log(x);
   }
 
@@ -68,13 +72,14 @@ struct Log
 };
 
 template <typename Arg>
-HD_INLINE UnaryOp<Log, Arg> log(Arg arg) {
+HD_INLINE UnaryOp<Log, Arg> log(const Arg& arg) {
   return UnaryOp<Log, Arg>(arg);
 }
 
 struct Plus
 {
-  HD_INLINE static double apply(double a, double b) {
+  template <typename Left, typename Right>
+  HD_INLINE static auto apply(const Left& a, const Right& b) {
     return a + b;
   }
 
@@ -84,7 +89,7 @@ struct Plus
 };
 
 template <typename Left, typename Right>
-HD_INLINE BinaryOp<Plus, Left, Right> operator+ (Left lhs, Right rhs) {
+HD_INLINE BinaryOp<Plus, Left, Right> operator+ (const Left& lhs, const Right& rhs) {
   return BinaryOp<Plus, Left, Right>(lhs, rhs);
 }
 
@@ -100,7 +105,8 @@ HD_INLINE BinaryOp<Plus, Left, Right> operator+ (Left lhs, Right rhs) {
 
 struct Minus
 {
-  HD_INLINE static double apply(double a, double b) {
+  template <typename Left, typename Right>
+  HD_INLINE static auto apply(const Left& a, const Right& b) {
     return a - b;
   }
 
@@ -110,13 +116,14 @@ struct Minus
 };
 
 template <typename Left, typename Right>
-HD_INLINE BinaryOp<Minus, Left, Right> operator- (Left lhs, Right rhs) {
+HD_INLINE BinaryOp<Minus, Left, Right> operator- (const Left& lhs, const Right& rhs) {
   return BinaryOp<Minus, Left, Right>(lhs, rhs);
 }
 
 struct Multiply
 {
-  HD_INLINE static double apply(double a, double b) {
+  template <typename Left, typename Right>
+  HD_INLINE static auto apply(const Left& a, const Right& b) {
     return a * b;
   }
 
@@ -126,23 +133,14 @@ struct Multiply
 };
 
 template <typename Left, typename Right>
-HD_INLINE BinaryOp<Multiply, Left, Right> operator* (Left lhs, Right rhs) {
+HD_INLINE BinaryOp<Multiply, Left, Right> operator* (const Left& lhs, const Right& rhs) {
   return BinaryOp<Multiply, Left, Right>(lhs, rhs);
 }
 
-// template <typename Left>
-// BinaryOp<Multiply, Left, ConstOp> operator* (Left lhs, double rhs) {
-//     return BinaryOp<Multiply, Left, ConstOp>(lhs, ConstOp(rhs));
-// }
-
-// template <typename Right>
-// BinaryOp<Multiply, ConstOp, Right> operator* (double lhs, Right rhs) {
-//     return BinaryOp<Multiply, ConstOp, Right>(ConstOp(lhs), rhs);
-// }
-
 struct Divide
 {
-  HD_INLINE static double apply(double a, double b) {
+  template <typename Left, typename Right>
+  HD_INLINE static auto apply(const Left& a, const Right& b) {
     return a / b;
   }
 
@@ -152,24 +150,15 @@ struct Divide
 };
 
 template <typename Left, typename Right>
-HD_INLINE BinaryOp<Divide, Left, Right> operator/ (Left lhs, Right rhs) {
+HD_INLINE BinaryOp<Divide, Left, Right> operator/ (const Left& lhs, const Right& rhs) {
   return BinaryOp<Divide, Left, Right>(lhs, rhs);
 }
-
-// template <typename Left>
-// BinaryOp<Divide, Left, ConstOp> operator/ (Left lhs, double rhs) {
-//     return BinaryOp<Divide, Left, ConstOp>(lhs, ConstOp(rhs));
-// }
-
-// template <typename Right>
-// BinaryOp<Divide, ConstOp, Right> operator/ (double lhs, Right rhs) {
-//     return BinaryOp<Divide, ConstOp, Right>(ConstOp(lhs), rhs);
-// }
 
 template<int power>
 struct Pow
 {
-  HD_INLINE static double apply(double a) {
+  template <typename Data>
+  HD_INLINE static auto apply(const Data& a) {
     return pow(a, power);
   }
 
@@ -181,13 +170,14 @@ struct Pow
 };
 
 template <int power, typename Arg>
-HD_INLINE UnaryOp<Pow<power>, Arg> pow(Arg arg) {
+HD_INLINE UnaryOp<Pow<power>, Arg> pow(const Arg& arg) {
   return UnaryOp<Pow<power>, Arg>(arg);
 }
 
 struct Sqrt
 {
-  HD_INLINE static double apply(double a) {
+  template <typename Data>
+  HD_INLINE static auto apply(const Data& a) {
     return sqrt(a);
   }
 
@@ -197,13 +187,14 @@ struct Sqrt
 };
 
 template <typename Arg>
-HD_INLINE UnaryOp<Sqrt, Arg> sqrt(Arg arg) {
+HD_INLINE UnaryOp<Sqrt, Arg> sqrt(const Arg& arg) {
   return UnaryOp<Sqrt, Arg>(arg);
 }
 
 struct Square
 {
-  HD_INLINE static double apply(double a) {
+  template <typename Data>
+  HD_INLINE static auto apply(const Data& a) {
     return a * a;
   }
 
@@ -213,7 +204,7 @@ struct Square
 };
 
 template <typename Arg>
-HD_INLINE UnaryOp<Square, Arg> square(Arg arg) {
+HD_INLINE UnaryOp<Square, Arg> square(const Arg& arg) {
   return UnaryOp<Square, Arg>(arg);
 }
 
@@ -221,4 +212,4 @@ HD_INLINE UnaryOp<Square, Arg> square(Arg arg) {
 
 
 
-#endif   // ----- #ifndef _FUNCTIONS_H_  ----- 
+#endif   // ----- #ifndef _FUNCTIONS_H_  -----

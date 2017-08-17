@@ -26,7 +26,8 @@ struct Var
   typedef Var<Argument, Data> type;
 
   HOST_DEVICE Var() {}
-  HD_INLINE Data operator() (Data x1, Data x2 = 0.0, Data x3 = 0.0, Data x4 = 0.0) const {
+
+  HD_INLINE const Data& operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) const {
     if (1 == Argument)
       return x1;
     else if (2 == Argument)
@@ -36,7 +37,7 @@ struct Var
     else if (4 == Argument)
       return x4;
     else
-      return Data();
+      return x1;
   }
 
   template <typename T>
@@ -99,4 +100,4 @@ static Var<3, double> _phi;
 // #define _2 Var<2, double>()
 // #define _3 Var<3, double>()
 
-#endif   // ----- #ifndef _VARIABLE_H_  ----- 
+#endif   // ----- #ifndef _VARIABLE_H_  -----

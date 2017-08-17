@@ -55,10 +55,10 @@ HD_INLINE
 typename Derivative<Argument, UnaryOp<Op, Expr> >::result_type
 D(const UnaryOp<Op, Expr>& expr);
 
-template <int Argument, int n>
+template <int Argument, int n, typename Data>
 HD_INLINE
-typename Derivative<Argument, Var<n, double> >::result_type
-D(const Var<n, double>& var);
+typename Derivative<Argument, Var<n, Data> >::result_type
+D(const Var<n, Data>& var);
 
 template <int Argument>
 HD_INLINE
@@ -90,7 +90,8 @@ struct Derivative<Argument, Derivative<Arg2, Expr> >
 
   HOST_DEVICE Derivative(arg_type expr) : derivative(Simplify(D<Argument>(expr))) {}
 
-  HD_INLINE double operator() (double x1, double x2 = 0.0, double x3 = 0.0, double x4 = 0.0) {
+  template <typename Data>
+  HD_INLINE auto operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
     return derivative(x1, x2, x3, x4);
   }
 };
@@ -111,7 +112,8 @@ struct Derivative<Argument, BinaryOp<Plus, Left, Right> >
   HOST_DEVICE Derivative(Left t1, Right t2) : derivative(simplify(D<Argument>(t1) + D<Argument>(t2))) {}
   HOST_DEVICE Derivative(arg_type expr) : derivative(simplify(D<Argument>(expr.left) + D<Argument>(expr.right))) {}
 
-  HD_INLINE double operator() (double x1, double x2 = 0.0, double x3 = 0.0, double x4 = 0.0) {
+  template <typename Data>
+  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
     return derivative(x1, x2, x3, x4);
   }
 };
@@ -133,7 +135,8 @@ struct Derivative<Argument, BinaryOp<Minus, Left, Right> >
   HOST_DEVICE Derivative(arg_type expr) : derivative(D<Argument>(expr.left), D<Argument>(expr.right)) {}
   HOST_DEVICE Derivative() {}
 
-  HD_INLINE double operator() (double x1, double x2 = 0.0, double x3 = 0.0, double x4 = 0.0) {
+  template <typename Data>
+  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
     return derivative(x1, x2, x3, x4);
   }
 };
@@ -155,7 +158,8 @@ struct Derivative<Argument, BinaryOp<Multiply, Left, Right> >
       derivative(simplify(expr.left * D<Argument>(expr.right) + D<Argument>(expr.left) * expr.right)) {}
   HOST_DEVICE Derivative() {}
 
-  HD_INLINE double operator() (double x1, double x2 = 0.0, double x3 = 0.0, double x4 = 0.0) {
+  template <typename Data>
+  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
     return derivative(x1, x2, x3, x4);
   }
 };
@@ -181,7 +185,8 @@ struct Derivative<Argument, BinaryOp<Divide, Left, Right> >
 
   HOST_DEVICE Derivative() {}
 
-  HD_INLINE double operator() (double x1, double x2 = 0.0, double x3 = 0.0, double x4 = 0.0) {
+  template <typename Data>
+  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
     return derivative(x1, x2, x3, x4);
   }
 };
@@ -194,11 +199,12 @@ struct Derivative<Argument, UnaryOp<Sin, Arg> >
   typedef BinaryOp<Multiply, UnaryOp<Cos, Arg>,
                    typename Derivative<Argument, Arg>::result_type > result_type;
   result_type derivative;
-    
+
   HOST_DEVICE Derivative(Arg arg) : derivative(cos(arg), D<Argument>(arg)) {}
   HOST_DEVICE Derivative(arg_type expr) : derivative(cos(expr.arg), D<Argument>(expr.arg)) {}
-    
-  HD_INLINE double operator() (double x1, double x2 = 0.0, double x3 = 0.0, double x4 = 0.0) {
+
+  template <typename Data>
+  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
     return derivative(x1, x2, x3, x4);
   }
 };
@@ -215,7 +221,8 @@ struct Derivative<Argument, UnaryOp<Cos, Arg> >
   HOST_DEVICE Derivative(Arg arg) : derivative(-1.0 * sin(arg), D<Argument>(arg)) {}
   HOST_DEVICE Derivative(arg_type expr) : derivative(-1.0 * sin(expr.arg), D<Argument>(expr.arg)) {}
 
-  HD_INLINE double operator() (double x1, double x2 = 0.0, double x3 = 0.0, double x4 = 0.0) {
+  template <typename Data>
+  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
     return derivative(x1, x2, x3, x4);
   }
 };
@@ -232,7 +239,8 @@ struct Derivative<Argument, UnaryOp<Exp, Arg> >
   HOST_DEVICE Derivative(Arg arg) : derivative(exp(arg), D<Argument>(arg)) {}
   HOST_DEVICE Derivative(arg_type expr) : derivative(exp(expr.arg), D<Argument>(expr.arg)) {}
 
-  HD_INLINE double operator() (double x1, double x2 = 0.0, double x3 = 0.0, double x4 = 0.0) {
+  template <typename Data>
+  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
     return derivative(x1, x2, x3, x4);
   }
 };
@@ -248,7 +256,8 @@ struct Derivative<Argument, UnaryOp<Log, Arg> >
   HOST_DEVICE Derivative(Arg arg) : derivative(D<Argument>(arg), arg) {}
   HOST_DEVICE Derivative(arg_type expr) : derivative(D<Argument>(expr.arg), expr.arg) {}
 
-  HD_INLINE double operator() (double x1, double x2 = 0.0, double x3 = 0.0, double x4 = 0.0) {
+  template <typename Data>
+  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
     return derivative(x1, x2, x3, x4);
   }
 };
@@ -258,16 +267,17 @@ template <int Argument, int n, typename Arg>
 struct Derivative<Argument, UnaryOp<Pow<n>, Arg> >
 {
   typedef UnaryOp<Pow<n>, Arg> arg_type;
-  typedef BinaryOp<Multiply, 
+  typedef BinaryOp<Multiply,
                    BinaryOp<Multiply, double, typename Derivative<Argument, Arg>::result_type>
-                   , UnaryOp<Pow< n-1 >, Arg> > 
+                   , UnaryOp<Pow< n-1 >, Arg> >
       result_type;
   result_type derivative;
 
   HOST_DEVICE Derivative(Arg arg) : derivative((double)n * D<Argument>(arg), pow<n-1>(arg)) {}
   HOST_DEVICE Derivative(arg_type expr) : derivative((double)n * D<Argument>(expr.arg), pow<n-1>(expr.arg)) {}
 
-  HD_INLINE double operator() (double x1, double x2 = 0.0, double x3 = 0.0, double x4 = 0.0) {
+  template <typename Data>
+  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
     return derivative(x1, x2, x3, x4);
   }
 };
@@ -286,7 +296,8 @@ struct Derivative<Argument, UnaryOp<Square, Arg> >
   HOST_DEVICE Derivative(Arg arg) : derivative(simplify(simplify(ConstOp(2.0) * D<Argument>(arg)) * arg)) {}
   HOST_DEVICE Derivative(arg_type expr) : derivative(simplify(simplify(ConstOp(2.0) * D<Argument>(expr.arg)) * expr.arg)) {}
 
-  HD_INLINE double operator() (double x1, double x2 = 0.0, double x3 = 0.0, double x4 = 0.0) {
+  template <typename Data>
+  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
     return derivative(x1, x2, x3, x4);
   }
 };
@@ -296,23 +307,24 @@ template <int Argument, typename Arg>
 struct Derivative<Argument, UnaryOp<Sqrt, Arg> >
 {
   typedef UnaryOp<Sqrt, Arg> arg_type;
-  typedef BinaryOp<Divide, 
+  typedef BinaryOp<Divide,
                    typename Derivative<Argument, Arg>::result_type
-                   , BinaryOp<Multiply, ConstOp, UnaryOp<Sqrt, Arg> > > 
+                   , BinaryOp<Multiply, ConstOp, UnaryOp<Sqrt, Arg> > >
   result_type;
   result_type derivative;
-    
+
   HOST_DEVICE Derivative(Arg arg) : derivative(D<Argument>(arg), ConstOp(2.0) * sqrt(arg)) {}
   HOST_DEVICE Derivative(arg_type expr) : derivative(D<Argument>(expr.arg), ConstOp(2.0) * sqrt(expr.arg)) {}
-    
-  HD_INLINE double operator() (double x1, double x2 = 0.0, double x3 = 0.0, double x4 = 0.0) {
+
+  template <typename Data>
+  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
     return derivative(x1, x2, x3, x4);
   }
 };
 
 // Derivative of a constant
 template <int Argument>
-struct Derivative<Argument, ConstOp>
+struct Derivative<Argument, ConstOp >
 {
   typedef ConstOp arg_type;
   typedef ZeroOp result_type;
@@ -320,7 +332,8 @@ struct Derivative<Argument, ConstOp>
 
   HOST_DEVICE Derivative() : derivative() {}
 
-  HD_INLINE double operator() (double x1, double x2 = 0.0, double x3 = 0.0, double x4 = 0.0) {
+  template <typename Data>
+  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
     return derivative(x1, x2, x3, x4);
   }
 };
@@ -334,7 +347,8 @@ struct Derivative<Argument, double>
 
   HOST_DEVICE Derivative() : derivative() {}
 
-  HD_INLINE double operator() (double x1, double x2 = 0.0, double x3 = 0.0, double x4 = 0.0) {
+  template <typename Data>
+  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
     return derivative(x1, x2, x3, x4);
   }
 };
@@ -348,16 +362,17 @@ struct Derivative<Argument, ZeroOp>
 
   HOST_DEVICE Derivative() : derivative() {}
 
-  HD_INLINE double operator() (double x1, double x2 = 0.0, double x3 = 0.0, double x4 = 0.0) {
+  template <typename Data>
+  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
     return derivative(x1, x2, x3, x4);
   }
 };
 
 // Derivative of an independent variable, producing Kronicker delta
-template <int Argument, int var>
-struct Derivative<Argument, Var<var, double > >
+template <int Argument, int var, typename Data>
+struct Derivative<Argument, Var<var, Data> >
 {
-  typedef Var<var, double> arg_type;
+  typedef Var<var, Data> arg_type;
   typedef ZeroOp result_type;
   result_type derivative;
 
@@ -366,15 +381,15 @@ struct Derivative<Argument, Var<var, double > >
     derivative = ZeroOp();
   }
 
-  HD_INLINE double operator() (double x1, double x2 = 0.0, double x3 = 0.0, double x4 = 0.0) {
+  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
     return derivative(x1, x2, x3, x4);
   }
 };
 
-template <int var>
-struct Derivative<var, Var<var, double> >
+template <int var, typename Data>
+struct Derivative<var, Var<var, Data> >
 {
-  typedef Var<var, double> arg_type;
+  typedef Var<var, Data> arg_type;
   typedef ConstOp result_type;
   result_type derivative;
 
@@ -382,7 +397,7 @@ struct Derivative<var, Var<var, double> >
     derivative = ConstOp(1.0);
   }
 
-  HD_INLINE double operator() (double x1, double x2 = 0.0, double x3 = 0.0, double x4 = 0.0) {
+  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
     return derivative(x1, x2, x3, x4);
   }
 };
@@ -398,7 +413,7 @@ struct Derivative<var, Var<var, double> >
 
 //     HOST_DEVICE Derivative_n(arg_type expr) : derivative(D<Argument>(D_n<Argument, times - 1>(expr))) {
 //     }
-    
+
 //     HD_INLINE double operator() (double x1, double x2 = 0.0, double x3 = 0.0, double x4 = 0.0) {
 //         return derivative(x1, x2, x3, x4);
 //     }
@@ -412,7 +427,7 @@ struct Derivative<var, Var<var, double> >
 //     result_type derivative;
 
 //     HOST_DEVICE Derivative_n(arg_type expr) : derivative(D<Argument>(expr)) {}
-    
+
 //     HD_INLINE double operator() (double x1, double x2 = 0.0, double x3 = 0.0, double x4 = 0.0) {
 //         return derivative(x1, x2, x3, x4);
 //     }
@@ -426,7 +441,7 @@ struct Derivative<var, Var<var, double> >
 //     result_type derivative;
 
 //     HOST_DEVICE Derivative_n(arg_type expr) : derivative(expr) {}
-    
+
 //     HD_INLINE double operator() (double x1, double x2 = 0.0, double x3 = 0.0, double x4 = 0.0) {
 //         return derivative(x1, x2, x3, x4);
 //     }
@@ -437,12 +452,12 @@ struct Derivative<var, Var<var, double> >
 // struct Derivative_2n
 // {
 //     typedef Expr arg_type;
-//     typedef typename Derivative<Arg1, 
+//     typedef typename Derivative<Arg1,
 //                                 typename Derivative_2n<Arg1, n1 - 1, Arg2, n2, Expr>::result_type>::result_type result_type;
 //     result_type derivative;
 
 //     HOST_DEVICE Derivative_2n(arg_type expr) : derivative(D<Arg1>(D_nm<Arg1, n1 - 1, Arg2, n2>(expr))) {}
-    
+
 //     HD_INLINE double operator() (double x1, double x2 = 0.0, double x3 = 0.0, double x4 = 0.0) {
 //         return derivative(x1, x2, x3, x4);
 //     }
@@ -452,12 +467,12 @@ struct Derivative<var, Var<var, double> >
 // struct Derivative_2n<Arg1, 1, Arg2, n2, Expr>
 // {
 //     typedef Expr arg_type;
-//     typedef typename Derivative<Arg1, 
+//     typedef typename Derivative<Arg1,
 //                                 typename Derivative_n<Arg2, n2, Expr>::result_type>::result_type result_type;
 //     result_type derivative;
 
 //     HOST_DEVICE Derivative_2n(arg_type expr) : derivative(D<Arg1>(D_n<Arg2, n2>(expr))) {}
-    
+
 //     HD_INLINE double operator() (double x1, double x2 = 0.0, double x3 = 0.0, double x4 = 0.0) {
 //         return derivative(x1, x2, x3, x4);
 //     }
@@ -471,7 +486,7 @@ struct Derivative<var, Var<var, double> >
 //     result_type derivative;
 
 //     HOST_DEVICE Derivative_2n(arg_type expr) : derivative(D_n<Arg2, n2>(expr)) {}
-    
+
 //     HD_INLINE double operator() (double x1, double x2 = 0.0, double x3 = 0.0, double x4 = 0.0) {
 //         return derivative(x1, x2, x3, x4);
 //     }
@@ -482,7 +497,7 @@ struct Derivative<var, Var<var, double> >
 ////////////////////////////////////////////////////////////////////////////////
 template <int Argument, typename Op, typename Left, typename Right>
 HD_INLINE
-typename Derivative<Argument, BinaryOp<Op, Left, Right> >::result_type 
+typename Derivative<Argument, BinaryOp<Op, Left, Right> >::result_type
 D(const BinaryOp<Op, Left, Right>& expr) {
   // printf("Constructed derivative: %s\n", __PRETTY_FUNCTION__);
   return Derivative<Argument, BinaryOp<Op, Left, Right> >(expr.left, expr.right).derivative;
@@ -490,14 +505,14 @@ D(const BinaryOp<Op, Left, Right>& expr) {
 
 template <int Argument,typename Op, typename Right>
 HD_INLINE
-typename Derivative<Argument, BinaryOp<Op, double, Right> >::result_type 
+typename Derivative<Argument, BinaryOp<Op, double, Right> >::result_type
 D(const BinaryOp<Op, double, Right>& expr) {
   return Derivative<Argument, BinaryOp<Op, double, Right> >(expr.left.val, expr.right).derivative;
 }
 
 template <int Argument,typename Op, typename Left>
 HD_INLINE
-typename Derivative<Argument, BinaryOp<Op, Left, double> >::result_type 
+typename Derivative<Argument, BinaryOp<Op, Left, double> >::result_type
 D(const BinaryOp<Op, Left, double>& expr) {
   return Derivative<Argument, BinaryOp<Op, Left, double> >(expr.left, expr.right.val).derivative;
 }
@@ -509,11 +524,18 @@ D(const UnaryOp<Op, Expr>& expr) {
   return Derivative<Argument, UnaryOp<Op, Expr> >(expr.arg).derivative;
 }
 
-template <int Argument, int n>
+// template <int Argument, int n>
+// HD_INLINE
+// typename Derivative<Argument, Var<n, double> >::result_type
+// D(const Var<n, double>& var) {
+//   return Derivative<Argument, Var<n, double> >().derivative;
+// }
+
+template <int Argument, int n, typename Data>
 HD_INLINE
-typename Derivative<Argument, Var<n, double> >::result_type
-D(const Var<n, double>& var) {
-  return Derivative<Argument, Var<n, double> >().derivative;
+typename Derivative<Argument, Var<n, Data> >::result_type
+D(const Var<n, Data>& var) {
+  return Derivative<Argument, Var<n, Data> >().derivative;
 }
 
 template <int Argument>
@@ -596,5 +618,4 @@ D(const Derivative<Arg2, Expr>& deriv) {
 
 }
 
-#endif   // ----- #ifndef _DERIVATIVE_H_  ----- 
-
+#endif   // ----- #ifndef _DERIVATIVE_H_  -----
