@@ -3,8 +3,8 @@
 #include "catch.hpp"
 
 using namespace Aperture;
-using CudaLE::D;
-using CudaLE::simplify;
+using namespace CudaLE;
+// using CudaLE::simplify;
 
 TEST_CASE("Printing metric name", "[metric]") {
   parse_metric("Cartesian");
@@ -59,10 +59,11 @@ TEST_CASE("Kerr Schild derivative", "[metric]") {
   parse_metric("Kerr_Schild 1.0 0.9");
 
   auto g = metric::g_metric_kerr_schild.g33;
+
   auto f = simplify(D<1>(D<2>(g)));
   auto f2 = simplify(D<2>(D<3>(g)));
 
-  // f.print(); CudaLE::helper::print("\n");
+  simplify(D<1>(g)).print(); CudaLE::helper::print("\n");
   // f2.print(); CudaLE::helper::print("\n");
 
   REQUIRE(f(2.0, 1.3, 2.0) == Approx(2.06201));

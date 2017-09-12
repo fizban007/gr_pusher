@@ -368,6 +368,21 @@ struct Derivative<Argument, ZeroOp>
   }
 };
 
+template <int Argument>
+struct Derivative<Argument, OneOp>
+{
+  typedef OneOp arg_type;
+  typedef ZeroOp result_type;
+  result_type derivative;
+
+  HOST_DEVICE Derivative() : derivative() {}
+
+  template <typename Data>
+  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
+    return derivative(x1, x2, x3, x4);
+  }
+};
+
 // Derivative of an independent variable, producing Kronicker delta
 template <int Argument, int var, typename Data>
 struct Derivative<Argument, Var<var, Data> >
@@ -378,7 +393,7 @@ struct Derivative<Argument, Var<var, Data> >
 
   HOST_DEVICE Derivative() {
     static_assert(Argument != var, "Template matching error, Var and argument should be same");
-    derivative = ZeroOp();
+    derivative = ZeroOp{};
   }
 
   HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
@@ -390,11 +405,11 @@ template <int var, typename Data>
 struct Derivative<var, Var<var, Data> >
 {
   typedef Var<var, Data> arg_type;
-  typedef ConstOp result_type;
+  typedef OneOp result_type;
   result_type derivative;
 
   HOST_DEVICE Derivative() {
-    derivative = ConstOp(1.0);
+    derivative = OneOp{};
   }
 
   HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
@@ -557,6 +572,13 @@ HD_INLINE
 typename Derivative<Argument, ZeroOp>::result_type
 D(const ZeroOp& val) {
   return Derivative<Argument, ZeroOp>().derivative;
+}
+
+template <int Argument>
+HD_INLINE
+typename Derivative<Argument, OneOp>::result_type
+D(const OneOp& val) {
+  return Derivative<Argument, OneOp>().derivative;
 }
 
 template <int Argument, int Arg2, typename Expr>

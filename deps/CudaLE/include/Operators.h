@@ -59,7 +59,51 @@ struct ZeroOp
   }
 
   HD_INLINE void print() const {
-    helper::print(0.0);
+    helper::print("Zero");
+  }
+};
+
+struct OneOp
+{
+  typedef OneOp type;
+
+  HOST_DEVICE OneOp() {}
+
+  template <typename Data>
+  HD_INLINE double operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) const {
+    return 0.0;
+  }
+
+  template <typename T>
+  HD_INLINE
+  typename std::enable_if<std::is_same<T, type>::value, bool>::type
+  operator== (const T& obj) const {
+    return true;
+  }
+
+  template <typename T>
+  HD_INLINE
+  typename std::enable_if<std::is_same<T, type>::value == false, bool>::type
+  operator== (const T& obj) const {
+    return false;
+  }
+
+  template <typename T>
+  HD_INLINE
+  typename std::enable_if<std::is_same<T, type>::value, bool>::type
+  operator!= (const T& obj) const {
+    return false;
+  }
+
+  template <typename T>
+  HD_INLINE
+  typename std::enable_if<std::is_same<T, type>::value == false, bool>::type
+  operator!= (const T& obj) const {
+    return true;
+  }
+
+  HD_INLINE void print() const {
+    helper::print(1.0);
   }
 };
 
@@ -71,6 +115,9 @@ struct ConstOp
   HOST_DEVICE ConstOp(double v) : val(v) {}
   HOST_DEVICE ConstOp(const ConstOp& op) : val(op.val) {}
   HOST_DEVICE ConstOp() : val(0.0) {}
+
+  // Allow ConstOp to be converted to double automatically
+  HD_INLINE operator double() const { return val; }
 
   template <typename Data>
   HD_INLINE double operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) const {
