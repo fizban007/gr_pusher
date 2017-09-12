@@ -1,0 +1,45 @@
+* Todo list
+** Test cases
+*** Gyration in a constant B field
+    Energy oscillates at a relative error level of 10^-7. Radius / angular
+    momentum oscillates at a relative error of 2*10^-5. Both oscillations
+    correlate with gyration period. There is a systematic build-up of error in
+    theta. In other words, the orbit tilts systematically over time, resulting
+    in a tilt of 3.5e-5 in radians over several gyrations. The cause of this
+    tilting is unknown.
+
+    Changing initial momentum and B field does not change the relative error.
+    Neither does it change the orbit tilting.
+
+*** Addition: Gyration in a very high constant B field
+
+*** Gyration in a constant B field with E field
+    Energy has very high frequency oscillations with relative amplitude of order
+    10^-5. Conservation of energy not very good. Here, conservation of energy is
+    with respect to the work done by E field in the z direction. Hypothesized
+    reason is the interpolation error.
+
+**** TODO Use analytic field to test interpolation error?
+     If I insert the analytic field values to the pusher, does this reduce the
+     energy oscillation?
+
+*** Force-free with balanced-out E and B field
+*** Sophisticated gyration in E_r and B_z
+*** Schwarzschild orbit
+*** Schwarzschild orbit with force-free field
+*** Schwarzschild orbit with non-trivial B field
+
+* Numerical Units
+  \[
+  \tilde{r} = \frac{rc}{GM}, \qquad \tilde{L} = \frac{L}{GM^2}
+  \]
+
+* Circular Orbits
+** Schwarzschild
+   \[
+   r = \frac{L^2}{r_g} \pm L\sqrt{\frac{L^2}{r_g^2} - 3}
+   \]
+** Boyer-Lindquist
+   \[
+   L = \frac{\sqrt{Mr} - 2aM/r + a^2\sqrt{M/r^3}}{\sqrt{1 - 3M/r + 2a\sqrt{M/r^3}}}
+   \]
