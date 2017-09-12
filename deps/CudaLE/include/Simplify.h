@@ -104,7 +104,7 @@ struct Simplified<Derivative<Argument, Expr>> {
   typedef typename Simplified<typename Derivative<Argument, Expr>::result_type>::result_type result_type;
   result_type result;
 
-  HOST_DEVICE Simplified(arg_type expr) : result(simplify(expr.derivative));
+  HOST_DEVICE Simplified(arg_type expr) : result(simplify(expr.derivative)) {}
 
   template <typename Data>
   HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
