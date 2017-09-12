@@ -215,20 +215,20 @@ int
 main(int argc, char* argv[]) {
   Particle ptc;
   ptc.x[1] = 3.1415926535898 * 0.5;
-  double L = sqrt(3.0) + 1.0e-12;
-  ptc.u[2] = L;
+  double L = sqrt(4.0) + 1.0e-12;
+  ptc.u[2] = L * 1.1;
   ptc.x[0] = L * L + sqrt(L * L - 3.0) * L;
 
   Schwarzschild<var> metric(1.0);
   Schwarzschild<double> metric_num(1.0);
   MetricCache<var> cache;
-  const double dt = 0.1;
+  const double dt = 0.01;
   // Particle ptc_initial = ptc;
   std::ofstream out("schwarzschild-isco-0.1.txt", std::ofstream::out);
   out << std::setprecision(std::numeric_limits<double>::digits10 + 2);
   timer::stamp();
 
-  std::cout << std::setprecision(std::numeric_limits<double>::digits10 + 2);
+  // std::cout << std::setprecision(std::numeric_limits<double>::digits10 + 2);
   double u_0 = u0_energy(ptc.x, ptc.u, metric_num);
   // auto pos = grid.mesh().pos_particle(p.cell, p.x);
   auto pos = ptc.x;
@@ -238,12 +238,10 @@ main(int argc, char* argv[]) {
   for (int n = 0; n < N; n++) {
     // std::cout << "At timestep " << n << std::endl;
 
-    // double u_0 = u0_energy(ptc.x, ptc.u, metric_num);
-    // // auto pos = grid.mesh().pos_particle(p.cell, p.x);
-    // auto pos = ptc.x;
-    // std::cout << pos << " " << pos.x * sin(pos.y) << " " << ptc.u << " " <<
-    // u_0
-    //           << std::endl;
+    double u_0 = u0_energy(ptc.x, ptc.u, metric_num);
+    // auto pos = grid.mesh().pos_particle(p.cell, p.x);
+    auto pos = ptc.x;
+    // std::cout << pos << " " << pos.x * sin(pos.y) << " " << ptc.u << " " << u_0 << std::endl;
 
     // if (n % 10 == 0)
     // out << pos.x << ", " << pos.y << ", " << pos.z << ", " << u_0 <<

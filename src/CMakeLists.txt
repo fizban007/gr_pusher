@@ -9,4 +9,7 @@ target_link_libraries(pusher-schwarzschild gr)
 add_executable(pusher-cks "pusher-cks.cpp")
 target_link_libraries(pusher-cks gr)
 
-add_executable(test "test.cpp")
+add_executable(pusher-boyer "pusher-boyer.cpp")
+target_link_libraries(pusher-boyer gr)
+
+# add_executable(test "test.cpp")
