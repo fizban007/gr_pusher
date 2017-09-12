@@ -34,4 +34,22 @@ std::array<std::array<Double, 3>, 3> invert(
   return result;
 }
 
+template <typename Double>
+std::array<std::array<Double, 3>, 3> invert(
+    const std::array<std::array<Double, 3>, 3>& metric, const Double& det) {
+  std::array<std::array<Double, 3>, 3> result;
+
+  for (int i = 0; i < 3; i++) {
+    int minor_i[2] = {(i + 1) % 3, (i + 2) % 3};
+    for (int j = 0; j < 3; j++) {
+      int minor_j[2] = {(j + 1) % 3, (j + 2) % 3};
+      result[i][j] = metric[minor_i[0]][minor_j[0]] * metric[minor_i[1]][minor_j[1]]
+                     - metric[minor_i[0]][minor_j[1]] * metric[minor_i[1]][minor_j[0]];
+      result[i][j] /= det;
+    }
+  }
+
+  return result;
+}
+
 #endif  // _SOLVE_H_
