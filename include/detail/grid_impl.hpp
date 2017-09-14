@@ -569,7 +569,7 @@ Grid::setup_connection(const Metric& g) {
 template <typename Metric>
 Grid
 Grid::make_dual_f::operator()(const Metric& g, bool inverse) const {
-  Grid grid = grid.make_dual(inverse);
+  Grid grid = g.make_dual(inverse);
   grid.setup_metric(g, grid);
   return grid;
 }
