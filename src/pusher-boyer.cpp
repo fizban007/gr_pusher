@@ -208,6 +208,11 @@ u0_energy(const Vec3<Data>& x, const Vec3<Data>& u,
 //   }
 //   return result;
 // }
+// template <typename Data>
+// Data
+// Fu(int n, const Vec3<double>& u0, const Vec3<double>& x0, const Vec3<Data>& u,
+//    const Vec3<Data>& x, const Boyer_Lindquist<Data>& metric, double dt) {
+// }
 
 template <typename Data>
 Data
@@ -444,44 +449,55 @@ main(int argc, char* argv[]) {
   // double L = sqrt(3.0) * 2.0 * m + 1.0e-12;
   // ptc.u[0] = 0.0;
   // double r = L * L / (2.0 * m) + sqrt(L * L / (4.0 * m * m) - 3.0) * L;
-  double r = 5.0;
+  double r = 3.0;
   double theta = 3.1415926535898 * 0.5;
   double L = sqrt(m * r) - 2.0 * a * m / r + sqrt(m / (r * r * r)) * a * a;
   L /= sqrt(1.0 - 3.0 * m / r + 2.0 * a * sqrt(m / (r * r * r)));
-  L += 0.1;
+  // L += 0.5;
   // double u0 = -1.0 + 2.0 / r - L * L * (4.0 / (r * r) - 8.0 / (r * r * r));
   ptc.x[0] = r;
   ptc.x[1] = theta;
   // ptc.u[2] = metric_num.inv_g30(r, theta, 0.0) * u0 + metric_num.inv_g33(r,
   // theta, 0.0) * L;
   ptc.u[2] = L;
-  double u0 = u0_energy(ptc.x, ptc.u, metric_num);
-  std::cout << "Initial u0 is " << u0 << std::endl;
+  // ptc.u[1] = 1.0e-12 * metric_num.g11(ptc.x[0], ptc.x[1], ptc.x[2]);
+  // ptc.u[1] = 0.001;
+  double u_0 = u0_energy(ptc.x, ptc.u, metric_num);
+  auto pos = ptc.x;
+  std::cout << "Initial: x = " << pos << ", u = " << ptc.u << ", u_0 = " << u_0 << std::endl;
+  // std::cout << "Initial u0 is " << u_0 << std::endl;
   // ptc.x[1] = 10.0;
 
-  const double dt = 0.1;
+  const double dt = 0.01;
   // Particle ptc_initial = ptc;
   std::ofstream out("boyer-isco-0.1.txt", std::ofstream::out);
   out << std::setprecision(std::numeric_limits<double>::digits10 + 2);
   timer::stamp();
 
-  for (int n = 0; n < 100000; n++) {
-    std::cout << "At timestep " << n << std::endl;
+  int N = 100000;
+  for (int n = 0; n < N; n++) {
+    // std::cout << "At timestep " << n << std::endl;
 
-    double u_0 = u0_energy(ptc.x, ptc.u, metric_num);
+    // double u_0 = u0_energy(ptc.x, ptc.u, metric_num);
     // auto pos = grid.mesh().pos_particle(p.cell, p.x);
-    auto pos = ptc.x;
-    std::cout << pos << " " << ptc.u << " " << u_0 << std::endl;
+    // auto pos = ptc.x;
+    // std::cout << pos << " " << ptc.u << " " << u_0 << std::endl;
 
-    if (n % 10 == 0)
-      out << pos.x << ", " << pos.y << ", " << pos.z << ", " << u_0
-          << std::endl;
+    // if (n % 10 == 0)
+    //   out << pos.x << ", " << pos.y << ", " << pos.z << ", " << u_0
+    //       << std::endl;
 
     if (iterate_newton(ptc, metric, dt) == 1) {
       std::cout << "Iteration reached end without converging!" << std::endl;
       break;
     }
   }
+  double u_1 = u0_energy(ptc.x, ptc.u, metric_num);
+  // auto pos = grid.mesh().pos_particle(p.cell, p.x);
+  pos = ptc.x;
+  std::cout << "Final: x = " << pos << ", u = " << ptc.u << ", u_0 = " << u_1
+            << ", \\Delta u_0/u_0 = " << (u_1 - u_0) / u_0 << std::endl;
+  std::cout << "Evolved for " << N << " timesteps." << std::endl;
   timer::show_duration_since_stamp("Evolution time", "ms");
   out.close();
 

@@ -79,8 +79,7 @@ Fu(int n, const Vec3<double>& u0, const Vec3<double>& x0, int c0,
    double dt) {
   int mid_cell = 0;
   Vec3<Double> mid_x = mid_point(x, x0, cell, c0, mid_cell, grid);
-  Vec3<Double> mid_u(0.5 * (u[0] + u0[0]), 0.5 * (u[1] + u0[1]),
-                     0.5 * (u[2] + u0[2]));
+  Vec3<Double> mid_u {0.5 * (u[0] + u0[0]), 0.5 * (u[1] + u0[1]), 0.5 * (u[2] + u0[2])};
   // Double gamma = Gamma(mid_x, mid_u, mid_cell, grid);
   // std::cout << "Gamma is " << gamma.x() << std::endl;
   Double u_0 = 0.5 * u0_energy(x0, u0, c0, grid) + 0.5 * u0_energy(x, u, cell, grid);
@@ -96,9 +95,9 @@ Fu(int n, const Vec3<double>& u0, const Vec3<double>& x0, int c0,
   }
   for (int i = 0; i < 3; i++) {
     if (grid.conn_mask(n, i + 1, 0))
-      conn += grid.connection(n, i + 1, 0, mid_cell, mid_x) * mid_u[i] * u_0;
-    if (grid.conn_mask(n, 0, i + 1))
-      conn += grid.connection(n, 0, i + 1, mid_cell, mid_x) * mid_u[i] * u_0;
+      conn += 2.0 * grid.connection(n, i + 1, 0, mid_cell, mid_x) * mid_u[i] * u_0;
+    // if (grid.conn_mask(n, 0, i + 1))
+    //   conn += grid.connection(n, 0, i + 1, mid_cell, mid_x) * mid_u[i] * u_0;
   }
   conn += grid.connection(n, 0, 0, mid_cell, mid_x) * u_0 * u_0;
   return u[n] - u0[n] -
@@ -191,7 +190,8 @@ Fx(int n, const Vec3<double>& u0, const Vec3<double>& x0, int c0,
   result /= (Gamma(x, u, c, grid) + Gamma(x0, u0, c0, grid));
   // result /= 2.0 * Gamma(mid_x, mid_u, mid_cell, grid);
   result += x[n] - x0[n] - (cell_0[n] - cell[n]) * grid.mesh().delta[n] +
-            dt * grid.beta(n, mid_cell, mid_x);
+            // dt * grid.beta(n, mid_cell, mid_x);
+            0.5 * dt * (grid.beta(n, c, x) + grid.beta(n, c0, x0));
   return result;
 }
 
@@ -359,7 +359,10 @@ main(int argc, char* argv[]) {
       {"DIM1 256 1.0 5.00 2", "DIM2 256 0.0 3.14 2", "DIM3 256 0.0 6.28 2"});
   // {"DIM1 1024 1.0 5.00 1", "DIM2 1024 0.0 3.14 1", "DIM3 1 0.0 6.28 0"});
   // {"DIM1 256 1.0 5.00 1", "DIM2 256 0.0 3.14 1", "DIM3 1 0.0 6.28 0"});
-  auto m = metric::metric_spherical();
+  // auto m = metric::metric_spherical();
+  double m = 1.0;
+  double a = 0.0;
+  auto metric = metric::metric_boyer_lindquist(2.0 * m, a);
   //     {"DIM1 256 0.0 1.00 1", "DIM2 256 0.0 1.00 1", "DIM3 256 0.0 1.00 1"});
   // auto m = metric::metric_cartesian();
   // {"DIM1 256 0.0 2.00 2", "DIM2 256 0.0 3.14 2", "DIM3 256 0.0 6.28 2"});
@@ -370,40 +373,46 @@ main(int argc, char* argv[]) {
   // This line will cache all the necessary quantities on the grid, and save
   // them into a file. If a file with the same grid/metric configuration is
   // present, it reads from the file instead.
-  grid.setup_metric(m, grid);
+  grid.setup_metric(metric, grid);
 
   ////////////////////////////////////////////////////////////////////////////////
   ///  Initialize particle and field initial conditions.
   ////////////////////////////////////////////////////////////////////////////////
   Particle p;
-  Vec3<int> cell(128, 128 + grid.mesh().guard[1], grid.mesh().guard[2]);
-  p.cell = grid.mesh().get_idx(cell);
-  p.x[0] = 0.5 * grid.mesh().delta[0];
-  p.x[1] = 3.1415926535898 * 0.5 -
-           (cell[1] - grid.mesh().guard[1]) * grid.mesh().delta[1];
+  Vec3<float> rel_pos;
+  Vec3<Scalar> init_pos(4.0, 3.1415926535898 * 0.5, 0.0);
+  double r = init_pos[0];
+  double L = sqrt(m * r) - 2.0 * a * m / r + sqrt(m / (r * r * r)) * a * a;
+  L /= sqrt(1.0 - 3.0 * m / r + 2.0 * a * sqrt(m / (r * r * r)));
+  p.cell = grid.mesh().find_cell(init_pos, rel_pos );
+  // Vec3<int> cell(128, 128 + grid.mesh().guard[1], grid.mesh().guard[2]);
+  // p.cell = grid.mesh().get_idx(cell);
+  p.x[0] = rel_pos[0] * grid.mesh().delta[0];
+  p.x[1] = rel_pos[1] * grid.mesh().delta[1];
+  // p.x[1] = 3.1415926535898 * 0.5 -
+  //          (cell[1] - grid.mesh().guard[1]) * grid.mesh().delta[1];
   std::cout << "x[1] is " << p.x[1] << std::endl;
   // p.x[2] = 0.5 * grid.mesh().delta[2];
-  auto initial_pos = grid.mesh().pos_particle(p.cell, p.x);
-  double p_phi = 1.0 / (initial_pos.x * sin(initial_pos.y));
-  p.u[2] = p_phi * initial_pos.x * initial_pos.x * sin(initial_pos.y) *
-           sin(initial_pos.y);
+  // auto initial_pos = grid.mesh().pos_particle(p.cell, p.x);
+  // double p_phi = 1.0 / (initial_pos.x * sin(initial_pos.y));
+  p.u[2] = L;
   // p.u[2] =
-  double gamma = sqrt(1.0 + p_phi * p.u[2]);
+  // double gamma = sqrt(1.0 + p_phi * p.u[2]);
   std::cout << "Starting u2 is " << p.u[2] << std::endl;
   p.u[0] = 0.0;
   p.u[1] = 0.0;
 
-  VectorField<double> E(grid);
-  VectorField<double> B(grid);
-  double Bz = p_phi;
-  // double Bz = 100.0;
-  std::cout << "Bz is " << Bz << std::endl;
-  E.assign(0.0, 0);
-  E.assign(0.0, 1);
-  E.assign(0.0, 2);
-  B.initialize(0, Bz * cos(_theta));
-  B.initialize(1, -Bz * sin(_theta) / _r);
-  B.assign(0.0, 2);
+  // VectorField<double> E(grid);
+  // VectorField<double> B(grid);
+  // double Bz = p_phi;
+  // // double Bz = 100.0;
+  // std::cout << "Bz is " << Bz << std::endl;
+  // E.assign(0.0, 0);
+  // E.assign(0.0, 1);
+  // E.assign(0.0, 2);
+  // B.initialize(0, Bz * cos(_theta));
+  // B.initialize(1, -Bz * sin(_theta) / _r);
+  // B.assign(0.0, 2);
 
   // p.u[2] = 1.0;
   ////////////////////////////////////////////////////////////////////////////////
@@ -411,12 +420,12 @@ main(int argc, char* argv[]) {
   ////////////////////////////////////////////////////////////////////////////////
   const double dt = 0.01;
   Particle p_initial = p;
-  std::ofstream out("circle.txt", std::ofstream::out);
+  std::ofstream out("boyer-circle.txt", std::ofstream::out);
   timer::stamp();
   for (int n = 0; n < 10000; n++) {
     std::cout << "At timestep " << n << std::endl;
 
-    if (iterate_newton(p, grid, dt, E, B) == 1) {
+    if (iterate_newton(p, grid, dt) == 1) {
       std::cout << "Iteration reached end without converging!" << std::endl;
       break;
     }
