@@ -3,6 +3,7 @@
 #include "solve.h"
 #include "utils/timer.h"
 #include "vec3.h"
+#include "ptc.h"
 // #include "CudaLE.h"
 // #include <Eigen/Dense>
 #include <fstream>
@@ -80,13 +81,6 @@ using namespace CudaLE;
               METRIC.inv_g##B##3(X[0], X[1], X[2])))
 
 typedef fadbad::F<double, 6> var;
-
-struct Particle {
-  Vec3<double> x = {0.0, 0.0, 0.0};
-  Vec3<double> u = {0.0, 0.0, 0.0};
-  double u0 = 0.0;
-  double e_over_m = -1.0;
-};  // ----- end of struct Particle -----
 
 template <typename Data>
 struct Boyer_Lindquist {
