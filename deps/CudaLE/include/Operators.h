@@ -71,7 +71,7 @@ struct OneOp
 
   template <typename Data>
   HD_INLINE double operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) const {
-    return 0.0;
+    return 1.0;
   }
 
   template <typename T>
