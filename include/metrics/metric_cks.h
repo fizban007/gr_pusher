@@ -5,6 +5,7 @@
 #include "vec3.h"
 #include "ptc.h"
 
+using CudaLE::OneOp;
 
 namespace Aperture {
 
@@ -37,39 +38,46 @@ struct Cartesian_KS {
   DEFINE_FUNCTOR(l3, _z / r);
   DEFINE_FUNCTOR(f, 2.0 * m_ * r * r2 / (r2 * r2 + a_ * a_ * square(_z)));
 
+  DEFINE_FUNCTOR(alpha, sqrt(OneOp{} / (OneOp{} + f)));
+  DEFINE_FUNCTOR(a2, OneOp{} / (OneOp{} + f));
+
   DEFINE_FUNCTOR(g00, -1.0 + f);
   DEFINE_FUNCTOR(g01, f* l1);
   DEFINE_FUNCTOR(g02, f* l2);
   DEFINE_FUNCTOR(g03, f* l3);
   DEFINE_FUNCTOR(g10, f* l1);
-  DEFINE_FUNCTOR(g11, 1.0 + f * square(l1));
+  DEFINE_FUNCTOR(g11, OneOp{} + f * square(l1));
   DEFINE_FUNCTOR(g12, f* l1* l2);
   DEFINE_FUNCTOR(g13, f* l1* l3);
   DEFINE_FUNCTOR(g20, f* l2);
   DEFINE_FUNCTOR(g21, f* l1* l2);
-  DEFINE_FUNCTOR(g22, 1.0 + f * square(l2));
+  DEFINE_FUNCTOR(g22, OneOp{} + f * square(l2));
   DEFINE_FUNCTOR(g23, f* l2* l3);
   DEFINE_FUNCTOR(g30, f* l3);
   DEFINE_FUNCTOR(g31, f* l1* l3);
   DEFINE_FUNCTOR(g32, f* l2* l3);
-  DEFINE_FUNCTOR(g33, 1.0 + f * square(l3));
+  DEFINE_FUNCTOR(g33, OneOp{} + f * square(l3));
 
   DEFINE_FUNCTOR(inv_g00, -1.0 - f);
   DEFINE_FUNCTOR(inv_g01, f* l1);
   DEFINE_FUNCTOR(inv_g02, f* l2);
   DEFINE_FUNCTOR(inv_g03, f* l3);
   DEFINE_FUNCTOR(inv_g10, f* l1);
-  DEFINE_FUNCTOR(inv_g11, 1.0 - f * square(l1));
+  DEFINE_FUNCTOR(inv_g11, OneOp{} - f * square(l1));
   DEFINE_FUNCTOR(inv_g12, -1.0 * f * l1 * l2);
   DEFINE_FUNCTOR(inv_g13, -1.0 * f * l1 * l3);
   DEFINE_FUNCTOR(inv_g20, f* l2);
   DEFINE_FUNCTOR(inv_g21, -1.0 * f * l1 * l2);
-  DEFINE_FUNCTOR(inv_g22, 1.0 - f * square(l2));
+  DEFINE_FUNCTOR(inv_g22, OneOp{} - f * square(l2));
   DEFINE_FUNCTOR(inv_g23, -1.0 * f * l2 * l3);
   DEFINE_FUNCTOR(inv_g30, f* l3);
   DEFINE_FUNCTOR(inv_g31, -1.0 * f * l1 * l3);
   DEFINE_FUNCTOR(inv_g32, -1.0 * f * l2 * l3);
-  DEFINE_FUNCTOR(inv_g33, 1.0 - f * square(l3));
+  DEFINE_FUNCTOR(inv_g33, OneOp{} - f * square(l3));
+
+  DEFINE_FUNCTOR(b1, a2 * inv_g01);
+  DEFINE_FUNCTOR(b2, a2 * inv_g02);
+  DEFINE_FUNCTOR(b3, a2 * inv_g03);
 };
 
 template <typename Data>
@@ -78,7 +86,7 @@ mid_point(const Vec3<Data>& x, const Vec3<double>& x0);
 
 template <typename Data>
 Data
-quadratic_solve(const Data& a, const Data& b, const Data& c);
+quadratic_solve(const Data& a, const Data& b, const Data& c, float sign = -1.0);
 
 template <typename Data>
 Data
