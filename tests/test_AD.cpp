@@ -18,6 +18,12 @@ Double func(Double x, Double y) {
   return result;
 }
 
+template <typename Double>
+Double func2(Double x, Double y) {
+  Double result = x + y;
+  return result;
+}
+
 TEST_CASE("Derivative with respect to interpolation", "[derivative]") {
   F<double> x, f;
   x = 0.3;
@@ -88,4 +94,10 @@ TEST_CASE("Complex compounded derivatives with intermediate values", "[derivativ
   std::cout << "f(x) = " << fval << std::endl;
   std::cout << "dfdx(x) = " << dfdx << std::endl;
   std::cout << "dfdy(x) = " << dfdy << std::endl;
+}
+
+TEST_CASE("Convert from double", "[AD]") {
+  typedef F<double> var;
+  var a = func2(1.0, 2.0);
+  std::cout << a.x() << std::endl;
 }
