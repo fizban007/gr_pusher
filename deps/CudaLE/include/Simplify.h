@@ -237,6 +237,21 @@ struct Simplified<BinaryOp<Multiply, ZeroOp, Right> > {
   }
 };
 
+// Simplify left * zero = zero
+template <>
+struct Simplified<BinaryOp<Multiply, ZeroOp, ZeroOp> > {
+  typedef BinaryOp<Multiply, ZeroOp, ZeroOp> arg_type;
+  typedef ZeroOp result_type;
+  result_type result;
+
+  HOST_DEVICE Simplified(arg_type expr) : result(ZeroOp{}) {}
+
+  template <typename Data>
+  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
+    return result(x1, x2, x3, x4);
+  }
+};
+
 // Simplify left * one = left
 template <typename Left>
 struct Simplified<BinaryOp<Multiply, Left, OneOp> > {
