@@ -98,6 +98,6 @@ TEST_CASE("Complex compounded derivatives with intermediate values", "[derivativ
 
 TEST_CASE("Convert from double", "[AD]") {
   typedef F<double> var;
-  var a = func2(1.0, 2.0);
+  var a = func2<var>(1.0, 2.0);
   std::cout << a.x() << std::endl;
 }
