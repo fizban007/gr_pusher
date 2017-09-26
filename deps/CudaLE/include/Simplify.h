@@ -237,10 +237,40 @@ struct Simplified<BinaryOp<Multiply, ZeroOp, Right> > {
   }
 };
 
-// Simplify left * zero = zero
+// Special case zero * zero = zero
 template <>
 struct Simplified<BinaryOp<Multiply, ZeroOp, ZeroOp> > {
   typedef BinaryOp<Multiply, ZeroOp, ZeroOp> arg_type;
+  typedef ZeroOp result_type;
+  result_type result;
+
+  HOST_DEVICE Simplified(arg_type expr) : result(ZeroOp{}) {}
+
+  template <typename Data>
+  HD_INLINE auto operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0, const Data& x5 = 0.0, const Data& x6 = 0.0) {
+    return result(x1, x2, x3, x4, x5, x6);
+  }
+};
+
+// Special case zero * one = zero
+template <>
+struct Simplified<BinaryOp<Multiply, ZeroOp, OneOp> > {
+  typedef BinaryOp<Multiply, ZeroOp, OneOp> arg_type;
+  typedef ZeroOp result_type;
+  result_type result;
+
+  HOST_DEVICE Simplified(arg_type expr) : result(ZeroOp{}) {}
+
+  template <typename Data>
+  HD_INLINE auto operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0, const Data& x5 = 0.0, const Data& x6 = 0.0) {
+    return result(x1, x2, x3, x4, x5, x6);
+  }
+};
+
+// Special case one * zero = zero
+template <>
+struct Simplified<BinaryOp<Multiply, OneOp, ZeroOp> > {
+  typedef BinaryOp<Multiply, OneOp, ZeroOp> arg_type;
   typedef ZeroOp result_type;
   result_type result;
 
@@ -328,6 +358,21 @@ struct Simplified<BinaryOp<Divide, Left, OneOp> >
   }
 };
 
+// Simplify special case zero / one = zero
+template <>
+struct Simplified<BinaryOp<Divide, ZeroOp, OneOp> >
+{
+  typedef BinaryOp<Divide, ZeroOp, OneOp> arg_type;
+  typedef ZeroOp result_type;
+  result_type result;
+
+  HOST_DEVICE Simplified(arg_type expr) : result() {}
+
+  template <typename Data>
+  HD_INLINE auto operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0, const Data& x5 = 0.0, const Data& x6 = 0.0) {
+    return result(x1, x2, x3, x4, x5, x6);
+  }
+};
 }
 
 #endif  // _SIMPLIFY_H_
