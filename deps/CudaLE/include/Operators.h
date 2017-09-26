@@ -30,7 +30,7 @@ struct ZeroOp
   HOST_DEVICE ZeroOp(const Any1& any1, const Any2& any2) {}
 
   template <typename Data>
-  HD_INLINE double operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) const {
+  HD_INLINE double operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0, const Data& x5 = 0.0, const Data& x6 = 0.0) const {
     return 0.0;
   }
 
@@ -78,7 +78,7 @@ struct OneOp
   HOST_DEVICE OneOp(const Any1& any1, const Any2& any2) {}
 
   template <typename Data>
-  HD_INLINE double operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) const {
+  HD_INLINE double operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0, const Data& x5 = 0.0, const Data& x6 = 0.0) const {
     return 1.0;
   }
 
@@ -128,7 +128,7 @@ struct ConstOp
   HD_INLINE operator double() const { return val; }
 
   template <typename Data>
-  HD_INLINE double operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) const {
+  HD_INLINE double operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0, const Data& x5 = 0.0, const Data& x6 = 0.0) const {
     return val;
   }
 
@@ -177,8 +177,8 @@ struct BinaryOp
   HOST_DEVICE BinaryOp() {}
 
   template <typename Data>
-  HD_INLINE auto operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) const {
-    return Op::apply(left(x1, x2, x3, x4), right(x1, x2, x3, x4));
+  HD_INLINE auto operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0, const Data& x5 = 0.0, const Data& x6 = 0.0) const {
+    return Op::apply(left(x1, x2, x3, x4, x5, x6), right(x1, x2, x3, x4, x5, x6));
   }
 
   template <typename T>
@@ -231,8 +231,8 @@ struct BinaryOp<Op, Left, double>
   HOST_DEVICE BinaryOp() {}
 
   template<typename Data>
-  HD_INLINE auto operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) const {
-    return Op::apply(left(x1, x2, x3, x4), right(x1, x2, x3, x4));
+  HD_INLINE auto operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0, const Data& x5 = 0.0, const Data& x6 = 0.0) const {
+    return Op::apply(left(x1, x2, x3, x4, x5, x6), right(x1, x2, x3, x4, x5, x6));
   }
 
   template <typename T>
@@ -285,8 +285,8 @@ struct BinaryOp<Op, double, Right>
   HOST_DEVICE BinaryOp() {}
 
   template <typename Data>
-  HD_INLINE auto operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) const {
-    return Op::apply(left(x1, x2, x3, x4), right(x1, x2, x3, x4));
+  HD_INLINE auto operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0, const Data& x5 = 0.0, const Data& x6 = 0.0) const {
+    return Op::apply(left(x1, x2, x3, x4, x5, x6), right(x1, x2, x3, x4, x5, x6));
   }
 
   template <typename T>
@@ -339,8 +339,8 @@ struct BinaryOp<Op, double, double>
   HOST_DEVICE BinaryOp() {}
 
   template<typename Data>
-  HD_INLINE auto operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) const {
-    return Op::apply(left(x1, x2, x3, x4), right(x1, x2, x3, x4));
+  HD_INLINE auto operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0, const Data& x5 = 0.0, const Data& x6 = 0.0) const {
+    return Op::apply(left(x1, x2, x3, x4, x5, x6), right(x1, x2, x3, x4, x5, x6));
   }
 
   template <typename T>
@@ -391,8 +391,8 @@ struct UnaryOp
   HOST_DEVICE UnaryOp() {}
 
   template <typename Data>
-  HD_INLINE auto operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) const {
-    return Op::apply(arg(x1, x2, x3, x4));
+  HD_INLINE auto operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0, const Data& x5 = 0.0, const Data& x6 = 0.0) const {
+    return Op::apply(arg(x1, x2, x3, x4, x5, x6));
   }
 
   template <typename T>
@@ -440,8 +440,8 @@ struct UnaryOp
 //     HOST_DEVICE UnaryOp(Arg* t1) : arg(t1) {}
 //     HOST_DEVICE UnaryOp() {}
 
-//     HD_INLINE double operator() (double x1, double x2 = 0.0, double x3 = 0.0, double x4 = 0.0) {
-//         return Op::apply((*arg)(x1, x2, x3, x4));
+//     HD_INLINE double operator() (double x1, double x2 = 0.0, double x3 = 0.0, double x4 = 0.0, const Data& x5 = 0.0, const Data& x6 = 0.0) {
+//         return Op::apply((*arg)(x1, x2, x3, x4, x5, x6));
 //     }
 // };
 }

@@ -33,8 +33,8 @@ struct Simplified {
   HOST_DEVICE Simplified(arg_type expr) : result(expr) {}
 
   template <typename Data>
-  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
-    return result(x1, x2, x3, x4);
+  HD_INLINE auto operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0, const Data& x5 = 0.0, const Data& x6 = 0.0) {
+    return result(x1, x2, x3, x4, x5, x6);
   }
 
   HD_INLINE void print() const {
@@ -79,8 +79,8 @@ struct Simplified<BinaryOp<Op, Left, Right> > {
   HOST_DEVICE Simplified(arg_type expr) : result(simplify(expr.left), simplify(expr.right)) {}
 
   template <typename Data>
-  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
-    return result(x1, x2, x3, x4);
+  HD_INLINE auto operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0, const Data& x5 = 0.0, const Data& x6 = 0.0) {
+    return result(x1, x2, x3, x4, x5, x6);
   }
 };
 
@@ -93,8 +93,8 @@ struct Simplified<UnaryOp<Op, Arg> > {
   HOST_DEVICE Simplified(arg_type expr) : result(simplify(expr.arg)) {}
 
   template <typename Data>
-  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
-    return result(x1, x2, x3, x4);
+  HD_INLINE auto operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0, const Data& x5 = 0.0, const Data& x6 = 0.0) {
+    return result(x1, x2, x3, x4, x5, x6);
   }
 };
 
@@ -107,8 +107,8 @@ struct Simplified<Derivative<Argument, Expr>> {
   HOST_DEVICE Simplified(arg_type expr) : result(simplify(expr.derivative)) {}
 
   template <typename Data>
-  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
-    return result(x1, x2, x3, x4);
+  HD_INLINE auto operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0, const Data& x5 = 0.0, const Data& x6 = 0.0) {
+    return result(x1, x2, x3, x4, x5, x6);
   }
 };
 
@@ -127,8 +127,8 @@ struct Simplified<BinaryOp<Plus, Left, ZeroOp> > {
   HOST_DEVICE Simplified(arg_type expr) : result(simplify(expr.left)) {}
 
   template <typename Data>
-  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
-    return result(x1, x2, x3, x4);
+  HD_INLINE auto operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0, const Data& x5 = 0.0, const Data& x6 = 0.0) {
+    return result(x1, x2, x3, x4, x5, x6);
   }
 };
 
@@ -142,8 +142,8 @@ struct Simplified<BinaryOp<Plus, ZeroOp, Right> > {
   HOST_DEVICE Simplified(arg_type expr) : result(simplify(expr.right)) {}
 
   template <typename Data>
-  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
-    return result(x1, x2, x3, x4);
+  HD_INLINE auto operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0, const Data& x5 = 0.0, const Data& x6 = 0.0) {
+    return result(x1, x2, x3, x4, x5, x6);
   }
 };
 
@@ -157,8 +157,8 @@ struct Simplified<BinaryOp<Plus, ZeroOp, ZeroOp> > {
   HOST_DEVICE Simplified(arg_type expr) : result(ZeroOp{}) {}
 
   template <typename Data>
-  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
-    return result(x1, x2, x3, x4);
+  HD_INLINE auto operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0, const Data& x5 = 0.0, const Data& x6 = 0.0) {
+    return result(x1, x2, x3, x4, x5, x6);
   }
 };
 
@@ -172,8 +172,8 @@ struct Simplified<BinaryOp<Minus, Left, ZeroOp> > {
   HOST_DEVICE Simplified(arg_type expr) : result(expr.left) {}
 
   template <typename Data>
-  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
-    return result(x1, x2, x3, x4);
+  HD_INLINE auto operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0, const Data& x5 = 0.0, const Data& x6 = 0.0) {
+    return result(x1, x2, x3, x4, x5, x6);
   }
 };
 
@@ -187,8 +187,8 @@ struct Simplified<BinaryOp<Minus, Left, ZeroOp> > {
 //   HOST_DEVICE Simplified(arg_type expr) : result(simplify(expr.right)) {}
 
 //   template <typename Data>
-//   HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
-//     return result(x1, x2, x3, x4);
+//   HD_INLINE auto operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0, const Data& x5 = 0.0, const Data& x6 = 0.0) {
+//     return result(x1, x2, x3, x4, x5, x6);
 //   }
 // };
 
@@ -202,8 +202,8 @@ struct Simplified<BinaryOp<Minus, Left, ZeroOp> > {
 //   HOST_DEVICE Simplified(arg_type expr) : result(ZeroOp{}) {}
 
 //   template <typename Data>
-//   HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
-//     return result(x1, x2, x3, x4);
+//   HD_INLINE auto operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0, const Data& x5 = 0.0, const Data& x6 = 0.0) {
+//     return result(x1, x2, x3, x4, x5, x6);
 //   }
 // };
 
@@ -217,8 +217,8 @@ struct Simplified<BinaryOp<Multiply, Left, ZeroOp> > {
   HOST_DEVICE Simplified(arg_type expr) : result(ZeroOp{}) {}
 
   template <typename Data>
-  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
-    return result(x1, x2, x3, x4);
+  HD_INLINE auto operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0, const Data& x5 = 0.0, const Data& x6 = 0.0) {
+    return result(x1, x2, x3, x4, x5, x6);
   }
 };
 
@@ -232,8 +232,8 @@ struct Simplified<BinaryOp<Multiply, ZeroOp, Right> > {
   HOST_DEVICE Simplified(arg_type expr) : result(ZeroOp{}) {}
 
   template <typename Data>
-  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
-    return result(x1, x2, x3, x4);
+  HD_INLINE auto operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0, const Data& x5 = 0.0, const Data& x6 = 0.0) {
+    return result(x1, x2, x3, x4, x5, x6);
   }
 };
 
@@ -247,8 +247,8 @@ struct Simplified<BinaryOp<Multiply, ZeroOp, ZeroOp> > {
   HOST_DEVICE Simplified(arg_type expr) : result(ZeroOp{}) {}
 
   template <typename Data>
-  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
-    return result(x1, x2, x3, x4);
+  HD_INLINE auto operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0, const Data& x5 = 0.0, const Data& x6 = 0.0) {
+    return result(x1, x2, x3, x4, x5, x6);
   }
 };
 
@@ -262,8 +262,8 @@ struct Simplified<BinaryOp<Multiply, Left, OneOp> > {
   HOST_DEVICE Simplified(arg_type expr) : result(expr.left) {}
 
   template <typename Data>
-  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
-    return result(x1, x2, x3, x4);
+  HD_INLINE auto operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0, const Data& x5 = 0.0, const Data& x6 = 0.0) {
+    return result(x1, x2, x3, x4, x5, x6);
   }
 };
 
@@ -277,8 +277,8 @@ struct Simplified<BinaryOp<Multiply, OneOp, Right> > {
   HOST_DEVICE Simplified(arg_type expr) : result(expr.right) {}
 
   template <typename Data>
-  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
-    return result(x1, x2, x3, x4);
+  HD_INLINE auto operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0, const Data& x5 = 0.0, const Data& x6 = 0.0) {
+    return result(x1, x2, x3, x4, x5, x6);
   }
 };
 
@@ -292,8 +292,8 @@ struct Simplified<BinaryOp<Multiply, OneOp, OneOp> > {
   HOST_DEVICE Simplified(arg_type expr) : result(OneOp{}) {}
 
   template <typename Data>
-  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
-    return result(x1, x2, x3, x4);
+  HD_INLINE auto operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0, const Data& x5 = 0.0, const Data& x6 = 0.0) {
+    return result(x1, x2, x3, x4, x5, x6);
   }
 };
 
@@ -307,8 +307,8 @@ struct Simplified<BinaryOp<Divide, ZeroOp, Right> > {
   HOST_DEVICE Simplified(arg_type expr) : result(ZeroOp{}) {}
 
   template <typename Data>
-  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
-    return result(x1, x2, x3, x4);
+  HD_INLINE auto operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0, const Data& x5 = 0.0, const Data& x6 = 0.0) {
+    return result(x1, x2, x3, x4, x5, x6);
   }
 };
 
@@ -323,8 +323,8 @@ struct Simplified<BinaryOp<Divide, Left, OneOp> >
   HOST_DEVICE Simplified(arg_type expr) : result(expr.left) {}
 
   template <typename Data>
-  HD_INLINE Data operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) {
-    return result(x1, x2, x3, x4);
+  HD_INLINE auto operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0, const Data& x5 = 0.0, const Data& x6 = 0.0) {
+    return result(x1, x2, x3, x4, x5, x6);
   }
 };
 

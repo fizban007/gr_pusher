@@ -27,7 +27,7 @@ struct Var
 
   HOST_DEVICE Var() {}
 
-  HD_INLINE const Data& operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0) const {
+  HD_INLINE const Data& operator() (const Data& x1, const Data& x2 = 0.0, const Data& x3 = 0.0, const Data& x4 = 0.0, const Data& x5 = 0.0, const Data& x6 = 0.0) const {
     if (1 == Argument)
       return x1;
     else if (2 == Argument)
@@ -36,6 +36,10 @@ struct Var
       return x3;
     else if (4 == Argument)
       return x4;
+    else if (5 == Argument)
+      return x5;
+    else if (6 == Argument)
+      return x6;
     else
       return x1;
   }
@@ -68,6 +72,10 @@ struct Var
       helper::print("x3");
     else if (4 == Argument)
       helper::print("x4");
+    else if (5 == Argument)
+      helper::print("x5");
+    else if (6 == Argument)
+      helper::print("x6");
     else
       helper::print("");
   }
@@ -79,6 +87,8 @@ static Var<1, double> _1;
 static Var<2, double> _2;
 static Var<3, double> _3;
 static Var<4, double> _4;
+static Var<5, double> _5;
+static Var<6, double> _6;
 
 namespace cartesian {
 static Var<1, double> _x;
