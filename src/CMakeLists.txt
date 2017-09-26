@@ -1,11 +1,12 @@
 set(gr_src
   "grid.cpp" "multi_array.cpp" "metrics.cpp" "fields.cpp"
   "memory.cpp" "Logger.cpp" "timer.cpp" "solve.cpp"
-  "metrics/metric_cks.cpp")
+  "metrics-analytic.cpp" "geodesic_solve.cpp")
+  # "metrics/metric_cks.cpp")
 add_library(gr STATIC ${gr_src})
 
-add_executable(pusher-schwarzschild "pusher-schwarzschild.cpp")
-target_link_libraries(pusher-schwarzschild gr)
+# add_executable(pusher-schwarzschild "pusher-schwarzschild.cpp")
+# target_link_libraries(pusher-schwarzschild gr)
 
 add_executable(pusher-cks "pusher-cks.cpp")
 target_link_libraries(pusher-cks gr)
