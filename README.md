@@ -29,5 +29,6 @@ in the same directory. Note that GCC for whatever reason will take significantly
 longer than Intel compiler to compile the entire test suite, due to heavy use of
 template metaprogramming.
 
-After compiling, an executable `pusher` should be in the `gr_pusher/bin`
-directory. Run it to execute the test case that is written in `main.cpp`.
+After compiling, some executable starting with `pusher` should be in the
+`gr_pusher/bin` directory. Run it to execute the test case that is written in
+`main.cpp`.

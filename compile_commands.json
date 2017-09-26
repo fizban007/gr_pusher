@@ -1,1 +1,102 @@
-/home/alex/Projects/gr/ninja/compile_commands.json
+[
+{
+  "directory": "/home/alex/Projects/gr/src",
+  "command": "/usr/lib/ccache/bin/c++   -I/home/alex/Projects/gr/deps/eigen -I/home/alex/Projects/gr/deps/CudaLE/include -I/home/alex/Projects/gr/deps/catch/single_include -I/home/alex/Projects/gr/deps/FADBAD++ -I/home/alex/Projects/gr/include  -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter   -std=gnu++14 -o CMakeFiles/pusher-grid.dir/main.cpp.o -c /home/alex/Projects/gr/src/main.cpp",
+  "file": "/home/alex/Projects/gr/src/main.cpp"
+},
+{
+  "directory": "/home/alex/Projects/gr/src",
+  "command": "/usr/lib/ccache/bin/c++   -I/home/alex/Projects/gr/deps/eigen -I/home/alex/Projects/gr/deps/CudaLE/include -I/home/alex/Projects/gr/deps/catch/single_include -I/home/alex/Projects/gr/deps/FADBAD++ -I/home/alex/Projects/gr/include  -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter   -std=gnu++14 -o CMakeFiles/gr.dir/grid.cpp.o -c /home/alex/Projects/gr/src/grid.cpp",
+  "file": "/home/alex/Projects/gr/src/grid.cpp"
+},
+{
+  "directory": "/home/alex/Projects/gr/src",
+  "command": "/usr/lib/ccache/bin/c++   -I/home/alex/Projects/gr/deps/eigen -I/home/alex/Projects/gr/deps/CudaLE/include -I/home/alex/Projects/gr/deps/catch/single_include -I/home/alex/Projects/gr/deps/FADBAD++ -I/home/alex/Projects/gr/include  -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter   -std=gnu++14 -o CMakeFiles/gr.dir/multi_array.cpp.o -c /home/alex/Projects/gr/src/multi_array.cpp",
+  "file": "/home/alex/Projects/gr/src/multi_array.cpp"
+},
+{
+  "directory": "/home/alex/Projects/gr/src",
+  "command": "/usr/lib/ccache/bin/c++   -I/home/alex/Projects/gr/deps/eigen -I/home/alex/Projects/gr/deps/CudaLE/include -I/home/alex/Projects/gr/deps/catch/single_include -I/home/alex/Projects/gr/deps/FADBAD++ -I/home/alex/Projects/gr/include  -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter   -std=gnu++14 -o CMakeFiles/gr.dir/metrics.cpp.o -c /home/alex/Projects/gr/src/metrics.cpp",
+  "file": "/home/alex/Projects/gr/src/metrics.cpp"
+},
+{
+  "directory": "/home/alex/Projects/gr/src",
+  "command": "/usr/lib/ccache/bin/c++   -I/home/alex/Projects/gr/deps/eigen -I/home/alex/Projects/gr/deps/CudaLE/include -I/home/alex/Projects/gr/deps/catch/single_include -I/home/alex/Projects/gr/deps/FADBAD++ -I/home/alex/Projects/gr/include  -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter   -std=gnu++14 -o CMakeFiles/gr.dir/fields.cpp.o -c /home/alex/Projects/gr/src/fields.cpp",
+  "file": "/home/alex/Projects/gr/src/fields.cpp"
+},
+{
+  "directory": "/home/alex/Projects/gr/src",
+  "command": "/usr/lib/ccache/bin/c++   -I/home/alex/Projects/gr/deps/eigen -I/home/alex/Projects/gr/deps/CudaLE/include -I/home/alex/Projects/gr/deps/catch/single_include -I/home/alex/Projects/gr/deps/FADBAD++ -I/home/alex/Projects/gr/include  -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter   -std=gnu++14 -o CMakeFiles/gr.dir/memory.cpp.o -c /home/alex/Projects/gr/src/memory.cpp",
+  "file": "/home/alex/Projects/gr/src/memory.cpp"
+},
+{
+  "directory": "/home/alex/Projects/gr/src",
+  "command": "/usr/lib/ccache/bin/c++   -I/home/alex/Projects/gr/deps/eigen -I/home/alex/Projects/gr/deps/CudaLE/include -I/home/alex/Projects/gr/deps/catch/single_include -I/home/alex/Projects/gr/deps/FADBAD++ -I/home/alex/Projects/gr/include  -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter   -std=gnu++14 -o CMakeFiles/gr.dir/Logger.cpp.o -c /home/alex/Projects/gr/src/Logger.cpp",
+  "file": "/home/alex/Projects/gr/src/Logger.cpp"
+},
+{
+  "directory": "/home/alex/Projects/gr/src",
+  "command": "/usr/lib/ccache/bin/c++   -I/home/alex/Projects/gr/deps/eigen -I/home/alex/Projects/gr/deps/CudaLE/include -I/home/alex/Projects/gr/deps/catch/single_include -I/home/alex/Projects/gr/deps/FADBAD++ -I/home/alex/Projects/gr/include  -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter   -std=gnu++14 -o CMakeFiles/gr.dir/timer.cpp.o -c /home/alex/Projects/gr/src/timer.cpp",
+  "file": "/home/alex/Projects/gr/src/timer.cpp"
+},
+{
+  "directory": "/home/alex/Projects/gr/src",
+  "command": "/usr/lib/ccache/bin/c++   -I/home/alex/Projects/gr/deps/eigen -I/home/alex/Projects/gr/deps/CudaLE/include -I/home/alex/Projects/gr/deps/catch/single_include -I/home/alex/Projects/gr/deps/FADBAD++ -I/home/alex/Projects/gr/include  -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter   -std=gnu++14 -o CMakeFiles/gr.dir/solve.cpp.o -c /home/alex/Projects/gr/src/solve.cpp",
+  "file": "/home/alex/Projects/gr/src/solve.cpp"
+},
+{
+  "directory": "/home/alex/Projects/gr/src",
+  "command": "/usr/lib/ccache/bin/c++   -I/home/alex/Projects/gr/deps/eigen -I/home/alex/Projects/gr/deps/CudaLE/include -I/home/alex/Projects/gr/deps/catch/single_include -I/home/alex/Projects/gr/deps/FADBAD++ -I/home/alex/Projects/gr/include  -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter   -std=gnu++14 -o CMakeFiles/gr.dir/metrics-analytic.cpp.o -c /home/alex/Projects/gr/src/metrics-analytic.cpp",
+  "file": "/home/alex/Projects/gr/src/metrics-analytic.cpp"
+},
+{
+  "directory": "/home/alex/Projects/gr/src",
+  "command": "/usr/lib/ccache/bin/c++   -I/home/alex/Projects/gr/deps/eigen -I/home/alex/Projects/gr/deps/CudaLE/include -I/home/alex/Projects/gr/deps/catch/single_include -I/home/alex/Projects/gr/deps/FADBAD++ -I/home/alex/Projects/gr/include  -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter   -std=gnu++14 -o CMakeFiles/pusher-boyer.dir/pusher-boyer.cpp.o -c /home/alex/Projects/gr/src/pusher-boyer.cpp",
+  "file": "/home/alex/Projects/gr/src/pusher-boyer.cpp"
+},
+{
+  "directory": "/home/alex/Projects/gr/tests",
+  "command": "/usr/lib/ccache/bin/c++   -I/home/alex/Projects/gr/deps/eigen -I/home/alex/Projects/gr/deps/CudaLE/include -I/home/alex/Projects/gr/deps/catch/single_include -I/home/alex/Projects/gr/deps/FADBAD++ -I/home/alex/Projects/gr/include  -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter   -std=gnu++14 -o CMakeFiles/tests.dir/test.cpp.o -c /home/alex/Projects/gr/tests/test.cpp",
+  "file": "/home/alex/Projects/gr/tests/test.cpp"
+},
+{
+  "directory": "/home/alex/Projects/gr/tests",
+  "command": "/usr/lib/ccache/bin/c++   -I/home/alex/Projects/gr/deps/eigen -I/home/alex/Projects/gr/deps/CudaLE/include -I/home/alex/Projects/gr/deps/catch/single_include -I/home/alex/Projects/gr/deps/FADBAD++ -I/home/alex/Projects/gr/include  -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter   -std=gnu++14 -o CMakeFiles/tests.dir/test_cudaLE.cpp.o -c /home/alex/Projects/gr/tests/test_cudaLE.cpp",
+  "file": "/home/alex/Projects/gr/tests/test_cudaLE.cpp"
+},
+{
+  "directory": "/home/alex/Projects/gr/tests",
+  "command": "/usr/lib/ccache/bin/c++   -I/home/alex/Projects/gr/deps/eigen -I/home/alex/Projects/gr/deps/CudaLE/include -I/home/alex/Projects/gr/deps/catch/single_include -I/home/alex/Projects/gr/deps/FADBAD++ -I/home/alex/Projects/gr/include  -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter   -std=gnu++14 -o CMakeFiles/tests.dir/test_grid.cpp.o -c /home/alex/Projects/gr/tests/test_grid.cpp",
+  "file": "/home/alex/Projects/gr/tests/test_grid.cpp"
+},
+{
+  "directory": "/home/alex/Projects/gr/tests",
+  "command": "/usr/lib/ccache/bin/c++   -I/home/alex/Projects/gr/deps/eigen -I/home/alex/Projects/gr/deps/CudaLE/include -I/home/alex/Projects/gr/deps/catch/single_include -I/home/alex/Projects/gr/deps/FADBAD++ -I/home/alex/Projects/gr/include  -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter   -std=gnu++14 -o CMakeFiles/tests.dir/test_mesh.cpp.o -c /home/alex/Projects/gr/tests/test_mesh.cpp",
+  "file": "/home/alex/Projects/gr/tests/test_mesh.cpp"
+},
+{
+  "directory": "/home/alex/Projects/gr/tests",
+  "command": "/usr/lib/ccache/bin/c++   -I/home/alex/Projects/gr/deps/eigen -I/home/alex/Projects/gr/deps/CudaLE/include -I/home/alex/Projects/gr/deps/catch/single_include -I/home/alex/Projects/gr/deps/FADBAD++ -I/home/alex/Projects/gr/include  -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter   -std=gnu++14 -o CMakeFiles/tests.dir/test_field.cpp.o -c /home/alex/Projects/gr/tests/test_field.cpp",
+  "file": "/home/alex/Projects/gr/tests/test_field.cpp"
+},
+{
+  "directory": "/home/alex/Projects/gr/tests",
+  "command": "/usr/lib/ccache/bin/c++   -I/home/alex/Projects/gr/deps/eigen -I/home/alex/Projects/gr/deps/CudaLE/include -I/home/alex/Projects/gr/deps/catch/single_include -I/home/alex/Projects/gr/deps/FADBAD++ -I/home/alex/Projects/gr/include  -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter   -std=gnu++14 -o CMakeFiles/tests.dir/test_metric.cpp.o -c /home/alex/Projects/gr/tests/test_metric.cpp",
+  "file": "/home/alex/Projects/gr/tests/test_metric.cpp"
+},
+{
+  "directory": "/home/alex/Projects/gr/tests",
+  "command": "/usr/lib/ccache/bin/c++   -I/home/alex/Projects/gr/deps/eigen -I/home/alex/Projects/gr/deps/CudaLE/include -I/home/alex/Projects/gr/deps/catch/single_include -I/home/alex/Projects/gr/deps/FADBAD++ -I/home/alex/Projects/gr/include  -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter   -std=gnu++14 -o CMakeFiles/tests.dir/test_memory.cpp.o -c /home/alex/Projects/gr/tests/test_memory.cpp",
+  "file": "/home/alex/Projects/gr/tests/test_memory.cpp"
+},
+{
+  "directory": "/home/alex/Projects/gr/tests",
+  "command": "/usr/lib/ccache/bin/c++   -I/home/alex/Projects/gr/deps/eigen -I/home/alex/Projects/gr/deps/CudaLE/include -I/home/alex/Projects/gr/deps/catch/single_include -I/home/alex/Projects/gr/deps/FADBAD++ -I/home/alex/Projects/gr/include  -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter   -std=gnu++14 -o CMakeFiles/tests.dir/test_interpolation.cpp.o -c /home/alex/Projects/gr/tests/test_interpolation.cpp",
+  "file": "/home/alex/Projects/gr/tests/test_interpolation.cpp"
+},
+{
+  "directory": "/home/alex/Projects/gr/tests",
+  "command": "/usr/lib/ccache/bin/c++   -I/home/alex/Projects/gr/deps/eigen -I/home/alex/Projects/gr/deps/CudaLE/include -I/home/alex/Projects/gr/deps/catch/single_include -I/home/alex/Projects/gr/deps/FADBAD++ -I/home/alex/Projects/gr/include  -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter -std=c++14 -pthread -O3 -g -DNDEBUG -Wall -Wextra -fPIC -march=native -Wno-unused-parameter   -std=gnu++14 -o CMakeFiles/tests.dir/test_AD.cpp.o -c /home/alex/Projects/gr/tests/test_AD.cpp",
+  "file": "/home/alex/Projects/gr/tests/test_AD.cpp"
+}
+]

@@ -75,6 +75,11 @@ struct Schwarzschild : public MetricBase<Data> {
 
   DEFINE_FUNCTOR(alpha, sqrt(1.0 - 2.0 * m_ / _r));
   DEFINE_FUNCTOR(a2, 1.0 - 2.0 * m_ / _r);
+
+  DEFINE_FUNCTOR(inv_g00, 1.0 / (2.0 * m_ / _r - 1.0));
+  DEFINE_FUNCTOR(inv_g11, 1.0 - 2.0 * m_ / _r);
+  DEFINE_FUNCTOR(inv_g22, 1.0 / square(_r));
+  DEFINE_FUNCTOR(inv_g33, 1.0 / square(_r * sin(_theta)));
 };
 
 template <typename Data>
