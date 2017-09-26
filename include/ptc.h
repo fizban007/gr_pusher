@@ -1,6 +1,8 @@
 #ifndef _PARTICLE_H_
 #define _PARTICLE_H_
 
+#include "vec3.h"
+
 namespace Aperture {
 
 template <typename Data>

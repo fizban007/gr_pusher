@@ -207,6 +207,7 @@ using namespace CudaLE;
 
 int
 main(int argc, char* argv[]) {
+  SolverType type = SolverType::implicit;
   Particle<var> ptc;
   ptc.x[1] = 3.1415926535898 * 0.5;
   double L = sqrt(3.5);
@@ -238,7 +239,7 @@ main(int argc, char* argv[]) {
     // out << pos.x << ", " << pos.y << ", " << pos.z << ", " << u_0 <<
     // std::endl;
 
-    if (iterate_newton(ptc, metric, dt) == 1) {
+    if (iterate_newton(ptc, metric, dt, type) == 1) {
       std::cout << "Iteration reached end without converging!" << std::endl;
       break;
     }

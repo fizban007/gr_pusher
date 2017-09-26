@@ -372,6 +372,7 @@ using namespace CudaLE;
 
 int
 main(int argc, char* argv[]) {
+  SolverType type = SolverType::implicit;
   Particle<var> ptc;
   double m = 1.0;
   double a = 0.8;
@@ -416,15 +417,15 @@ main(int argc, char* argv[]) {
     // auto pos = ptc.x;
     // std::cout << pos << " " << ptc.u << " " << u_0 << std::endl;
 
-    if (n % 10 == 0)
-      std::cout << ptc << std::endl;
     //   out << pos.x << ", " << pos.y << ", " << pos.z << ", " << u_0
     //       << std::endl;
-
-    if (iterate_newton(ptc, metric, dt) == 1) {
+    int iter;
+    if ((iter = iterate_newton(ptc, metric, dt, type)) == -1) {
       std::cout << "Iteration reached end without converging!" << std::endl;
       break;
     }
+    if (n % 10 == 0)
+      std::cout << ptc << " in " << iter << " iterations" << std::endl;
   }
   auto u_1 = u0_energy(ptc.x, ptc.u, metric, ptc.is_photon);
   // auto pos = grid.mesh().pos_particle(p.cell, p.x);
