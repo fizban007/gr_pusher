@@ -374,7 +374,7 @@ int
 main(int argc, char* argv[]) {
   Particle<var> ptc;
   double m = 1.0;
-  double a = 0.0;
+  double a = 0.8;
   Boyer_Lindquist<var> metric(m, a);
   // Boyer_Lindquist<double> metric_num(m, a);
 
@@ -382,7 +382,7 @@ main(int argc, char* argv[]) {
   // double L = sqrt(3.0) * 2.0 * m + 1.0e-12;
   // ptc.u[0] = 0.0;
   // double r = L * L / (2.0 * m) + sqrt(L * L / (4.0 * m * m) - 3.0) * L;
-  double r = 3.5;
+  double r = 3.0;
   double theta = 3.1415926535898 * 0.5;
   double L = sqrt(m * r) - 2.0 * a * m / r + sqrt(m / (r * r * r)) * a * a;
   L /= sqrt(1.0 - 3.0 * m / r + 2.0 * a * sqrt(m / (r * r * r)));
@@ -394,20 +394,20 @@ main(int argc, char* argv[]) {
   // theta, 0.0) * L;
   ptc.u[2] = L;
   // ptc.u[1] = 1.0e-12 * metric_num.g11(ptc.x[0], ptc.x[1], ptc.x[2]);
-  ptc.u[1] = 0.0;
-  auto u_0 = u0_energy(ptc.x, ptc.u, metric);
+  ptc.u[1] = 0.3;
+  auto u_0 = u0_energy(ptc.x, ptc.u, metric, ptc.is_photon);
   // auto pos = ptc.x;
   std::cout << "Initial: " << ptc << ", u_0 = " << u_0.x() << std::endl;
   // std::cout << "Initial u0 is " << u_0 << std::endl;
   // ptc.x[1] = 10.0;
 
-  const double dt = 0.01;
+  const double dt = 0.1;
   // Particle ptc_initial = ptc;
   std::ofstream out("boyer-isco-0.1.txt", std::ofstream::out);
   out << std::setprecision(std::numeric_limits<double>::digits10 + 2);
   timer::stamp();
 
-  int N = 100000;
+  int N = 10000;
   for (int n = 0; n < N; n++) {
     // std::cout << "At timestep " << n << std::endl;
 
@@ -416,7 +416,8 @@ main(int argc, char* argv[]) {
     // auto pos = ptc.x;
     // std::cout << pos << " " << ptc.u << " " << u_0 << std::endl;
 
-    // if (n % 10 == 0)
+    if (n % 10 == 0)
+      std::cout << ptc << std::endl;
     //   out << pos.x << ", " << pos.y << ", " << pos.z << ", " << u_0
     //       << std::endl;
 
@@ -425,7 +426,7 @@ main(int argc, char* argv[]) {
       break;
     }
   }
-  auto u_1 = u0_energy(ptc.x, ptc.u, metric);
+  auto u_1 = u0_energy(ptc.x, ptc.u, metric, ptc.is_photon);
   // auto pos = grid.mesh().pos_particle(p.cell, p.x);
   // pos = ptc.x;
   std::cout << "Final: " << ptc << ", u_0 = " << u_1.x()

@@ -8,15 +8,15 @@ using namespace CudaLE;
 
 #define INSTANTIATE_TEMPLATES(METRIC)                                          \
   template var Gamma<METRIC>(const Vec3<var>& x, const Vec3<var>& u,           \
-                             const METRIC& metric);                            \
+                             const METRIC& metric, bool is_photon);            \
   template var u0_energy<METRIC>(const Vec3<var>& x, const Vec3<var>& u,       \
-                                 const METRIC& metric);                        \
+                                 const METRIC& metric, bool is_photon);        \
   template var FuncX::operator()<METRIC>(                                      \
       int n, const Vec3<var>& x0, const Vec3<var>& u0, const Vec3<var>& x,     \
-      const Vec3<var>& u, const METRIC& metric, double dt);                    \
+      const Vec3<var>& u, const METRIC& metric, double dt, bool is_photon);    \
   template var FuncU::operator()<METRIC>(                                      \
       int n, const Vec3<var>& x0, const Vec3<var>& u0, const Vec3<var>& x,     \
-      const Vec3<var>& u, const METRIC& metric, double dt);                    \
+      const Vec3<var>& u, const METRIC& metric, double dt, bool is_photon);    \
   template int iterate_newton<METRIC>(Particle<var> & p, const METRIC& metric, \
                                       double dt)
 #define CONN(METRIC, I, A, B, X)                                               \
@@ -87,8 +87,13 @@ mid_point(const Vec3<var>& x, const Vec3<var>& x0) {
 
 template <typename Metric>
 var
-Gamma(const Vec3<var>& x, const Vec3<var>& u, const Metric& metric) {
-  var result = 1.0;
+Gamma(const Vec3<var>& x, const Vec3<var>& u, const Metric& metric,
+      bool is_photon) {
+  var result;
+  if (is_photon)
+    result = 0.0;
+  else
+    result = 1.0;
 
   result += u[0] * u[0] * metric.inv_g11(x[0], x[1], x[2]) +
             u[1] * u[1] * metric.inv_g22(x[0], x[1], x[2]) +
@@ -107,8 +112,9 @@ Gamma(const Vec3<var>& x, const Vec3<var>& u, const Metric& metric) {
 
 template <typename Metric>
 var
-u0_energy(const Vec3<var>& x, const Vec3<var>& u, const Metric& metric) {
-  var result = -Gamma(x, u, metric) * metric.a2(x[0], x[1], x[2]);
+u0_energy(const Vec3<var>& x, const Vec3<var>& u, const Metric& metric,
+          bool is_photon) {
+  var result = -Gamma(x, u, metric, is_photon) * metric.a2(x[0], x[1], x[2]);
   result += metric.b1(x[0], x[1], x[2]) * u[0] +
             metric.b2(x[0], x[1], x[2]) * u[1] +
             metric.b3(x[0], x[1], x[2]) * u[2];
@@ -120,15 +126,16 @@ template <typename Metric>
 var
 FuncX::operator()(int n, const Vec3<var>& x0, const Vec3<var>& u0,
                   const Vec3<var>& x, const Vec3<var>& u, const Metric& metric,
-                  double dt) {
+                  double dt, bool is_photon) {
   // var result;
   Vec3<var> mid_x = mid_point(x, x0);
   Vec3<var> mid_u = mid_point(u, u0);
 
-  var gamma = Gamma(mid_x, mid_u, metric);
+  var gamma = Gamma(mid_x, mid_u, metric, is_photon);
   var ub = (mid_u[0] * metric.b1(mid_x[0], mid_x[1], mid_x[2]) +
-           mid_u[1] * metric.b2(mid_x[0], mid_x[1], mid_x[2]) +
-            mid_u[2] * metric.b3(mid_x[0], mid_x[1], mid_x[2])) / gamma;
+            mid_u[1] * metric.b2(mid_x[0], mid_x[1], mid_x[2]) +
+            mid_u[2] * metric.b3(mid_x[0], mid_x[1], mid_x[2])) /
+           gamma;
   if (n == 0) {
     return x[0] - x0[0] -
            dt * ((mid_u[0] * metric.inv_g11(mid_x[0], mid_x[1], mid_x[2]) +
@@ -139,20 +146,20 @@ FuncX::operator()(int n, const Vec3<var>& x0, const Vec3<var>& u0,
                      metric.b1(mid_x[0], mid_x[1], mid_x[2]));
   } else if (n == 1) {
     return x[1] - x0[1] -
-        dt * ((mid_u[0] * metric.inv_g21(mid_x[0], mid_x[1], mid_x[2]) +
-               mid_u[1] * metric.inv_g22(mid_x[0], mid_x[1], mid_x[2]) +
-               mid_u[2] * metric.inv_g23(mid_x[0], mid_x[1], mid_x[2])) /
-              gamma +
-              (ub / metric.a2(mid_x[0], mid_x[1], mid_x[2]) - 1.0) *
-              metric.b2(mid_x[0], mid_x[1], mid_x[2]));
+           dt * ((mid_u[0] * metric.inv_g21(mid_x[0], mid_x[1], mid_x[2]) +
+                  mid_u[1] * metric.inv_g22(mid_x[0], mid_x[1], mid_x[2]) +
+                  mid_u[2] * metric.inv_g23(mid_x[0], mid_x[1], mid_x[2])) /
+                     gamma +
+                 (ub / metric.a2(mid_x[0], mid_x[1], mid_x[2]) - 1.0) *
+                     metric.b2(mid_x[0], mid_x[1], mid_x[2]));
   } else if (n == 2) {
     return x[2] - x0[2] -
-        dt * ((mid_u[0] * metric.inv_g31(mid_x[0], mid_x[1], mid_x[2]) +
-               mid_u[1] * metric.inv_g32(mid_x[0], mid_x[1], mid_x[2]) +
-               mid_u[2] * metric.inv_g33(mid_x[0], mid_x[1], mid_x[2])) /
-              gamma +
-              (ub / metric.a2(mid_x[0], mid_x[1], mid_x[2]) - 1.0) *
-              metric.b3(mid_x[0], mid_x[1], mid_x[2]));
+           dt * ((mid_u[0] * metric.inv_g31(mid_x[0], mid_x[1], mid_x[2]) +
+                  mid_u[1] * metric.inv_g32(mid_x[0], mid_x[1], mid_x[2]) +
+                  mid_u[2] * metric.inv_g33(mid_x[0], mid_x[1], mid_x[2])) /
+                     gamma +
+                 (ub / metric.a2(mid_x[0], mid_x[1], mid_x[2]) - 1.0) *
+                     metric.b3(mid_x[0], mid_x[1], mid_x[2]));
   } else {
     return 0.0;
   }
@@ -164,7 +171,7 @@ template <typename Metric>
 var
 FuncU::operator()(int n, const Vec3<var>& x0, const Vec3<var>& u0,
                   const Vec3<var>& x, const Vec3<var>& u, const Metric& metric,
-                  double dt) {
+                  double dt, bool is_photon) {
   // var result;
   Vec3<var> mid_x = mid_point(x, x0);
   Vec3<var> mid_u = mid_point(u, u0);
@@ -172,23 +179,12 @@ FuncU::operator()(int n, const Vec3<var>& x0, const Vec3<var>& u0,
   // std::cout << "Gamma is " << gamma.x() << std::endl;
   // var u_0 = 0.5 * u0_energy(x0, u0, metric) + 0.5 * u0_energy(x, u,
   // metric);
-  var u_0 = u0_energy(mid_x, mid_u, metric);
+  // var u_0 = u0_energy(mid_x, mid_u, metric);
   // std::cout << "u0 is " << u_0.x() << std::endl;
   var result = 0.0;
-  var gamma = Gamma(mid_x, mid_u, metric);
+  var gamma = Gamma(mid_x, mid_u, metric, is_photon);
 
   if (n == 0) {
-    // result += COEF(metric, 1, 0, 0, mid_x) * u_0 * u_0 / gamma +
-    //           2.0 * COEF(metric, 1, 0, 1, mid_x) * u_0 * mid_u[0] / gamma +
-    //           2.0 * COEF(metric, 1, 0, 2, mid_x) * u_0 * mid_u[1] / gamma +
-    //           2.0 * COEF(metric, 1, 0, 3, mid_x) * u_0 * mid_u[2] / gamma +
-    //           COEF(metric, 1, 1, 1, mid_x) * mid_u[0] * mid_u[0] / gamma +
-    //           COEF(metric, 1, 2, 2, mid_x) * mid_u[1] * mid_u[1] / gamma +
-    //           COEF(metric, 1, 3, 3, mid_x) * mid_u[2] * mid_u[2] / gamma +
-    //           2.0 * COEF(metric, 1, 1, 2, mid_x) * mid_u[0] * mid_u[1] /
-    //           gamma + 2.0 * COEF(metric, 1, 1, 3, mid_x) * mid_u[0] *
-    //           mid_u[2] / gamma + 2.0 * COEF(metric, 1, 2, 3, mid_x) *
-    //           mid_u[1] * mid_u[2] / gamma;
     result += D<1>(metric.b1)(mid_x[0], mid_x[1], mid_x[2]) * mid_u[0] +
               D<1>(metric.b2)(mid_x[0], mid_x[1], mid_x[2]) * mid_u[1] +
               D<1>(metric.b3)(mid_x[0], mid_x[1], mid_x[2]) * mid_u[2];
@@ -201,17 +197,6 @@ FuncU::operator()(int n, const Vec3<var>& x0, const Vec3<var>& u0,
               CONN(metric, 1, 1, 3, mid_x) * mid_u[0] * mid_u[2] / gamma +
               CONN(metric, 1, 2, 3, mid_x) * mid_u[1] * mid_u[2] / gamma;
   } else if (n == 1) {
-    // result += COEF(metric, 2, 0, 0, mid_x) * u_0 * u_0 / gamma +
-    //           2.0 * COEF(metric, 2, 0, 1, mid_x) * u_0 * mid_u[0] / gamma +
-    //           2.0 * COEF(metric, 2, 0, 2, mid_x) * u_0 * mid_u[1] / gamma +
-    //           2.0 * COEF(metric, 2, 0, 3, mid_x) * u_0 * mid_u[2] / gamma +
-    //           COEF(metric, 2, 1, 1, mid_x) * mid_u[0] * mid_u[0] / gamma +
-    //           COEF(metric, 2, 2, 2, mid_x) * mid_u[1] * mid_u[1] / gamma +
-    //           COEF(metric, 2, 3, 3, mid_x) * mid_u[2] * mid_u[2] / gamma +
-    //           2.0 * COEF(metric, 2, 1, 2, mid_x) * mid_u[0] * mid_u[1] /
-    //           gamma + 2.0 * COEF(metric, 2, 1, 3, mid_x) * mid_u[0] *
-    //           mid_u[2] / gamma + 2.0 * COEF(metric, 2, 2, 3, mid_x) *
-    //           mid_u[1] * mid_u[2] / gamma;
     result += D<2>(metric.b1)(mid_x[0], mid_x[1], mid_x[2]) * mid_u[0] +
               D<2>(metric.b2)(mid_x[0], mid_x[1], mid_x[2]) * mid_u[1] +
               D<2>(metric.b3)(mid_x[0], mid_x[1], mid_x[2]) * mid_u[2];
@@ -224,17 +209,6 @@ FuncU::operator()(int n, const Vec3<var>& x0, const Vec3<var>& u0,
               CONN(metric, 2, 1, 3, mid_x) * mid_u[0] * mid_u[2] / gamma +
               CONN(metric, 2, 2, 3, mid_x) * mid_u[1] * mid_u[2] / gamma;
   } else {
-    // result += COEF(metric, 3, 0, 0, mid_x) * u_0 * u_0 / gamma +
-    //           2.0 * COEF(metric, 3, 0, 1, mid_x) * u_0 * mid_u[0] / gamma +
-    //           2.0 * COEF(metric, 3, 0, 2, mid_x) * u_0 * mid_u[1] / gamma +
-    //           2.0 * COEF(metric, 3, 0, 3, mid_x) * u_0 * mid_u[2] / gamma +
-    //           COEF(metric, 3, 1, 1, mid_x) * mid_u[0] * mid_u[0] / gamma +
-    //           COEF(metric, 3, 2, 2, mid_x) * mid_u[1] * mid_u[1] / gamma +
-    //           COEF(metric, 3, 3, 3, mid_x) * mid_u[2] * mid_u[2] / gamma +
-    //           2.0 * COEF(metric, 3, 1, 2, mid_x) * mid_u[0] * mid_u[1] /
-    //           gamma + 2.0 * COEF(metric, 3, 1, 3, mid_x) * mid_u[0] *
-    //           mid_u[2] / gamma + 2.0 * COEF(metric, 3, 2, 3, mid_x) *
-    //           mid_u[1] * mid_u[2] / gamma;
     result += D<3>(metric.b1)(mid_x[0], mid_x[1], mid_x[2]) * mid_u[0] +
               D<3>(metric.b2)(mid_x[0], mid_x[1], mid_x[2]) * mid_u[1] +
               D<3>(metric.b3)(mid_x[0], mid_x[1], mid_x[2]) * mid_u[2];
@@ -248,7 +222,6 @@ FuncU::operator()(int n, const Vec3<var>& x0, const Vec3<var>& u0,
               CONN(metric, 3, 2, 3, mid_x) * mid_u[1] * mid_u[2] / gamma;
   }
   return u[n] - u0[n] - result * dt;
-  // return result;
 }
 
 template <typename Metric>
@@ -291,12 +264,12 @@ iterate_newton(Particle<var>& p, const Metric& metric, double dt) {
     u[2].diff(5);
     std::array<var, 6> f;
     // Compute the residual function
-    f[0] = Fx(0, p0.x, p0.u, x, u, metric, dt);
-    f[1] = Fx(1, p0.x, p0.u, x, u, metric, dt);
-    f[2] = Fx(2, p0.x, p0.u, x, u, metric, dt);
-    f[3] = Fu(0, p0.x, p0.u, x, u, metric, dt);
-    f[4] = Fu(1, p0.x, p0.u, x, u, metric, dt);
-    f[5] = Fu(2, p0.x, p0.u, x, u, metric, dt);
+    f[0] = Fx(0, p0.x, p0.u, x, u, metric, dt, p.is_photon);
+    f[1] = Fx(1, p0.x, p0.u, x, u, metric, dt, p.is_photon);
+    f[2] = Fx(2, p0.x, p0.u, x, u, metric, dt, p.is_photon);
+    f[3] = Fu(0, p0.x, p0.u, x, u, metric, dt, p.is_photon);
+    f[4] = Fu(1, p0.x, p0.u, x, u, metric, dt, p.is_photon);
+    f[5] = Fu(2, p0.x, p0.u, x, u, metric, dt, p.is_photon);
     // Fill the Jacobi matrix
     std::array<std::array<double, 6>, 6> J;
     std::array<double, 6> F, new_f;

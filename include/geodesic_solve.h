@@ -12,21 +12,21 @@ typedef fadbad::F<double, 6> var;
 Vec3<var> mid_point(const Vec3<var>& x, const Vec3<var>& x0);
 
 template <typename Metric>
-var Gamma(const Vec3<var>& x, const Vec3<var>& u, const Metric& metric);
+var Gamma(const Vec3<var>& x, const Vec3<var>& u, const Metric& metric, bool is_photon);
 
 template <typename Metric>
-var u0_energy(const Vec3<var>& x, const Vec3<var>& u, const Metric& metric);
+var u0_energy(const Vec3<var>& x, const Vec3<var>& u, const Metric& metric, bool is_photon);
 
 struct FuncX {
   template <typename Metric>
   var operator()(int n, const Vec3<var>& x0, const Vec3<var>& u0, const Vec3<var>& x,
-                 const Vec3<var>& u, const Metric& metric, double dt);
+                 const Vec3<var>& u, const Metric& metric, double dt, bool is_photon);
 };
 
 struct FuncU {
   template <typename Metric>
   var operator()(int n, const Vec3<var>& x0, const Vec3<var>& u0, const Vec3<var>& x,
-                 const Vec3<var>& u, const Metric& metric, double dt);
+                 const Vec3<var>& u, const Metric& metric, double dt, bool is_photon);
 };
 
 struct HamX {

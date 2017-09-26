@@ -42,7 +42,7 @@ main(int argc, char* argv[]) {
   for (int n = 0; n < 10000; n++) {
     std::cout << "At timestep " << n << std::endl;
 
-    var u_0 = u0_energy(ptc.x, ptc.u, metric);
+    var u_0 = u0_energy(ptc.x, ptc.u, metric, ptc.is_photon);
     // auto pos = grid.mesh().pos_particle(p.cell, p.x);
     auto pos = ptc.x;
     std::cout << ptc << " " << u_0.x()

@@ -222,7 +222,7 @@ main(int argc, char* argv[]) {
   timer::stamp();
 
   // std::cout << std::setprecision(std::numeric_limits<double>::digits10 + 2);
-  var u_0 = u0_energy(ptc.x, ptc.u, metric);
+  var u_0 = u0_energy(ptc.x, ptc.u, metric, ptc.is_photon);
   // auto pos = grid.mesh().pos_particle(p.cell, p.x);
   std::cout << "Initial: " << ptc << ", u_0 = " << u_0.x() << std::endl;
   const int N = 100000;
@@ -244,7 +244,7 @@ main(int argc, char* argv[]) {
     }
     std::cout << ptc << std::endl;
   }
-  var u_1 = u0_energy(ptc.x, ptc.u, metric);
+  var u_1 = u0_energy(ptc.x, ptc.u, metric, ptc.is_photon);
   // auto pos = grid.mesh().pos_particle(p.cell, p.x);
   std::cout << "Final: " << ptc << ", u_0 = " << u_1.x()
             << ", \\Delta u_0/u_0 = " << (u_1.x() - u_0.x()) / u_0.x() << std::endl;
