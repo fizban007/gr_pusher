@@ -84,8 +84,8 @@ using namespace CudaLE;
 namespace Aperture {
 
 const int max_iter = 100;
-const double tolerance = 1.0e-10;
-const double x_diff = 1.0e-10;
+const double tolerance = 1.0e-11;
+const double x_diff = 1.0e-13;
 
 Var<4, var> _4;
 Var<5, var> _5;
