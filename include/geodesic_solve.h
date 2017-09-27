@@ -52,6 +52,9 @@ struct HamU {
 template <typename Metric>
 int iterate_newton(Particle<var>& p, const Metric& metric, double dt, SolverType type);
 
+template <typename Metric>
+int iterate_rk4(Particle<var>& p, const Metric& metric, double dt);
+
 }  // namespace Aperture
 
 #endif  // _GEODESIC_SOLVE_H_

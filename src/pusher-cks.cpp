@@ -48,9 +48,9 @@ main(int argc, char* argv[]) {
 
   // Cartesian_KS<var> metric(1.0, 1.0);
   // Cartesian_KS<double> metric_num(1.0, 1.0);
-  const double dt = 0.001;
+  const double dt = 0.01;
   // Particle ptc_initial = ptc;
-  std::ofstream out("cks-L1.36-t-3-ham.txt", std::ofstream::out);
+  std::ofstream out("cks-L1.36-t-2-rk4-long.txt", std::ofstream::out);
   out << std::setprecision(std::numeric_limits<double>::digits10 + 2);
   timer::stamp();
 
@@ -68,7 +68,8 @@ main(int argc, char* argv[]) {
               // << std::endl;
 
     int iter;
-    if ((iter = iterate_newton(ptc, metric, dt, type)) == -1) {
+    // if ((iter = iterate_newton(ptc, metric, dt, type)) == -1) {
+    if ((iter = iterate_rk4(ptc, metric, dt)) == -1) {
       std::cout << "Iteration reached end without converging!" << std::endl;
       break;
     }
@@ -85,7 +86,7 @@ main(int argc, char* argv[]) {
              2.0 * metric.inv_g23(ptc.x[0], ptc.x[1], ptc.x[2]) * ptc.u[1] * ptc.u[2];
     double r = metric.r(ptc.x[0], ptc.x[1], ptc.x[2]).x();
     std::cout << "E diff = " << std::abs(u_0.x() + e_initial) / e_initial << ", u2 = " << uu.x() << ", r = " << std::abs(r - 1.8) << ", in " << iter << " iterations" << std::endl;
-    if (n % 1000 == 0)
+    if (n % 100 == 0)
       out << std::abs(u_0.x() + e_initial) / e_initial << ", " << uu.x() << ", " << std::abs(r - 1.8) << ", " << iter << std::endl;
 
   }
