@@ -331,7 +331,7 @@ HamX::operator()(int n, Vec3<var>& x0, Vec3<var>& u0, Vec3<var>& x,
                (6.0 * (u[2] - u0[2]));
     }
   }
-  return x[n] - x0[n] - dt * result;
+  return x[n] - x0[n] + dt * result;
 }
 
 template <typename Metric>
@@ -351,7 +351,7 @@ HamU::operator()(int n, Vec3<var>& x0, Vec3<var>& u0, Vec3<var>& x,
   if (n == 0) {
     if (std::abs(x[0].x() - x0[0].x()) < x_diff) {
       // Difference too small, use hamiltonian derivative
-      result = -(D<1>(H)(x[0], x0[1], x0[2], u0[0], u0[1], u0[2]) +
+      result = (D<1>(H)(x[0], x0[1], x0[2], u0[0], u0[1], u0[2]) +
                  D<1>(H)(x[0], x[1], x[2], u0[0], u[1], u[2]) +
                  D<1>(H)(x[0], x[1], x[2], u[0], u[1], u[2]) +
                  D<1>(H)(x[0], x0[1], x[2], u0[0], u0[1], u[2]) +
@@ -359,7 +359,7 @@ HamU::operator()(int n, Vec3<var>& x0, Vec3<var>& u0, Vec3<var>& x,
                  D<1>(H)(x[0], x0[1], x[2], u[0], u0[1], u[2])) /
                6.0;
     } else {
-      result = -(H(x[0], x0[1], x0[2], u0[0], u0[1], u0[2]) +
+      result = (H(x[0], x0[1], x0[2], u0[0], u0[1], u0[2]) +
                  H(x[0], x[1], x[2], u0[0], u[1], u[2]) +
                  H(x[0], x[1], x[2], u[0], u[1], u[2]) +
                  H(x[0], x0[1], x[2], u0[0], u0[1], u[2]) +
@@ -376,7 +376,7 @@ HamU::operator()(int n, Vec3<var>& x0, Vec3<var>& u0, Vec3<var>& x,
   } else if (n == 1) {
     if (std::abs(x[1].x() - x0[1].x()) < x_diff) {
       // Difference too small, use hamiltonian derivative
-      result = -(D<2>(H)(x[0], x[1], x0[2], u[0], u0[1], u0[2]) +
+      result = (D<2>(H)(x[0], x[1], x0[2], u[0], u0[1], u0[2]) +
                  D<2>(H)(x0[0], x[1], x0[2], u0[0], u0[1], u0[2]) +
                  D<2>(H)(x0[0], x[1], x0[2], u0[0], u[1], u0[2]) +
                  D<2>(H)(x[0], x[1], x[2], u[0], u0[1], u[2]) +
@@ -384,7 +384,7 @@ HamU::operator()(int n, Vec3<var>& x0, Vec3<var>& u0, Vec3<var>& x,
                  D<2>(H)(x[0], x[1], x[2], u[0], u[1], u[2])) /
                6.0;
     } else {
-      result = -(H(x[0], x[1], x0[2], u[0], u0[1], u0[2]) +
+      result = (H(x[0], x[1], x0[2], u[0], u0[1], u0[2]) +
                  H(x0[0], x[1], x0[2], u0[0], u0[1], u0[2]) +
                  H(x0[0], x[1], x0[2], u0[0], u[1], u0[2]) +
                  H(x[0], x[1], x[2], u[0], u0[1], u[2]) +
@@ -401,7 +401,7 @@ HamU::operator()(int n, Vec3<var>& x0, Vec3<var>& u0, Vec3<var>& x,
   } else if (n == 2) {
     if (std::abs(x[2].x() - x0[2].x()) < x_diff) {
       // Difference too small, use hamiltonian derivative
-      result = -(D<3>(H)(x[0], x[1], x[2], u[0], u[1], u0[2]) +
+      result = (D<3>(H)(x[0], x[1], x[2], u[0], u[1], u0[2]) +
                  D<3>(H)(x0[0], x[1], x[2], u0[0], u[1], u0[2]) +
                  D<3>(H)(x0[0], x[1], x[2], u0[0], u[1], u[2]) +
                  D<3>(H)(x0[0], x0[1], x[2], u0[0], u0[1], u0[2]) +
@@ -409,7 +409,7 @@ HamU::operator()(int n, Vec3<var>& x0, Vec3<var>& u0, Vec3<var>& x,
                  D<3>(H)(x0[0], x0[1], x[2], u0[0], u0[1], u[2])) /
                6.0;
     } else {
-      result = -(H(x[0], x[1], x[2], u[0], u[1], u0[2]) +
+      result = (H(x[0], x[1], x[2], u[0], u[1], u0[2]) +
                  H(x0[0], x[1], x[2], u0[0], u[1], u0[2]) +
                  H(x0[0], x[1], x[2], u0[0], u[1], u[2]) +
                  H(x0[0], x0[1], x[2], u0[0], u0[1], u0[2]) +
@@ -485,7 +485,7 @@ iterate_newton(Particle<var>& p, const Metric& metric, double dt,
     p.u[2] -= new_f[5];
 
     if (norm(new_f) <= tolerance) break;
-    if (i == max_iter - 1) return -1;
+    // if (i == max_iter - 1) return -1;
   }
   return i;
 }
