@@ -210,9 +210,12 @@ main(int argc, char* argv[]) {
   SolverType type = SolverType::implicit;
   Particle<var> ptc;
   ptc.x[1] = 3.1415926535898 * 0.5;
-  double L = sqrt(3.5);
+  double L = sqrt(4.0);
+  // double L = 100.0;
   ptc.u[2] = L;
-  ptc.x[0] = L * L + sqrt(L * L - 3.0) * L;
+  // ptc.x[0] = L * L + sqrt(L * L - 3.0) * L;
+  ptc.x[0] = 1.5 + 0.00000000001;
+  ptc.is_photon = true;
 
   Schwarzschild<var> metric(0.5);
 
@@ -226,7 +229,7 @@ main(int argc, char* argv[]) {
   var u_0 = u0_energy(ptc.x, ptc.u, metric, ptc.is_photon);
   // auto pos = grid.mesh().pos_particle(p.cell, p.x);
   std::cout << "Initial: " << ptc << ", u_0 = " << u_0.x() << std::endl;
-  const int N = 100000;
+  const int N = 1000;
   for (int n = 0; n < N; n++) {
     // std::cout << "At timestep " << n << std::endl;
 
@@ -239,10 +242,12 @@ main(int argc, char* argv[]) {
     // out << pos.x << ", " << pos.y << ", " << pos.z << ", " << u_0 <<
     // std::endl;
 
-    if (iterate_newton(ptc, metric, dt, type) == 1) {
-      std::cout << "Iteration reached end without converging!" << std::endl;
-      break;
-    }
+    // if (iterate_newton(ptc, metric, dt, type) == 100) {
+    //   std::cout << "Iteration reached end without converging!" << std::endl;
+    //   break;
+    // }
+    // iterate_rk4(ptc, metric, dt);
+    iterate_newton(ptc, metric, dt, type);
     std::cout << ptc << std::endl;
   }
   var u_1 = u0_energy(ptc.x, ptc.u, metric, ptc.is_photon);

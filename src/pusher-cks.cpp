@@ -49,6 +49,7 @@ main(int argc, char* argv[]) {
   // Cartesian_KS<var> metric(1.0, 1.0);
   // Cartesian_KS<double> metric_num(1.0, 1.0);
   const double dt = 0.01;
+  // const double dt = 1.0;
   // Particle ptc_initial = ptc;
   std::ofstream out("cks-L1.36-t-2-rk4-long.txt", std::ofstream::out);
   out << std::setprecision(std::numeric_limits<double>::digits10 + 2);
@@ -68,8 +69,8 @@ main(int argc, char* argv[]) {
               // << std::endl;
 
     int iter;
-    // if ((iter = iterate_newton(ptc, metric, dt, type)) == -1) {
-    if ((iter = iterate_rk4(ptc, metric, dt)) == -1) {
+    if ((iter = iterate_newton(ptc, metric, dt, type)) == -1) {
+    // if ((iter = iterate_rk4(ptc, metric, dt)) == -1) {
       std::cout << "Iteration reached end without converging!" << std::endl;
       break;
     }
