@@ -11,6 +11,8 @@ struct Particle {
 
   Vec3<Data> x = {0.0, 0.0, 0.0};
   Vec3<Data> u = {0.0, 0.0, 0.0};
+  Vec3<Data> dx = {0.005, 0.005, 0.005};
+  Vec3<Data> du = {0.005, 0.005, 0.005};
   bool is_photon = false;
   // double u0 = 0.0;
   // double e_over_m = -1.0;

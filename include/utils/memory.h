@@ -19,27 +19,27 @@ namespace Aperture {
 void* aligned_malloc(std::size_t size, std::size_t alignment);
 void aligned_free(void* p);
 
-template <typename StructOfArrays>
-void
-alloc_struct_of_arrays(StructOfArrays& data, std::size_t max_num, std::size_t alignment) {
-  boost::fusion::for_each(data, [max_num, alignment](auto& x) {
-      typedef typename std::remove_reference<decltype(*x)>::type x_type;
-      void* p = aligned_malloc(max_num * sizeof(x_type), alignment);
-      x = reinterpret_cast<typename std::remove_reference<decltype(x)>::type>(p);
-    });
-}
+// template <typename StructOfArrays>
+// void
+// alloc_struct_of_arrays(StructOfArrays& data, std::size_t max_num, std::size_t alignment) {
+//   boost::fusion::for_each(data, [max_num, alignment](auto& x) {
+//       typedef typename std::remove_reference<decltype(*x)>::type x_type;
+//       void* p = aligned_malloc(max_num * sizeof(x_type), alignment);
+//       x = reinterpret_cast<typename std::remove_reference<decltype(x)>::type>(p);
+//     });
+// }
 
-template <typename StructOfArrays>
-void
-free_struct_of_arrays(StructOfArrays& data) {
-  boost::fusion::for_each(data, [](auto& x) {
-      // x = nullptr;
-      if (x != nullptr) {
-        aligned_free(reinterpret_cast<void*>(x));
-        x = nullptr;
-      }
-    });
-}
+// template <typename StructOfArrays>
+// void
+// free_struct_of_arrays(StructOfArrays& data) {
+//   boost::fusion::for_each(data, [](auto& x) {
+//       // x = nullptr;
+//       if (x != nullptr) {
+//         aligned_free(reinterpret_cast<void*>(x));
+//         x = nullptr;
+//       }
+//     });
+// }
 
 }
 

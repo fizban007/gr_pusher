@@ -1,6 +1,10 @@
 set(gr_src
-  "grid.cpp" "multi_array.cpp" "metrics.cpp" "fields.cpp"
-  "memory.cpp" "Logger.cpp" "timer.cpp" "solve.cpp"
+  "grid.cpp"
+  "multi_array.cpp"
+  "metrics.cpp"
+  "fields.cpp"
+  "memory.cpp"
+  "Logger.cpp" "timer.cpp" "solve.cpp"
   "metrics-analytic.cpp" "geodesic_solve.cpp")
   # "metrics/metric_cks.cpp")
 add_library(gr STATIC ${gr_src})

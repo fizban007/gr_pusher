@@ -331,7 +331,7 @@ HamX::operator()(int n, Vec3<var>& x0, Vec3<var>& u0, Vec3<var>& x,
                (6.0 * (u[2] - u0[2]));
     }
   }
-  return x[n] - x0[n] + dt * result;
+  return x[n] - x0[n] - dt * result;
 }
 
 template <typename Metric>
@@ -424,7 +424,7 @@ HamU::operator()(int n, Vec3<var>& x0, Vec3<var>& u0, Vec3<var>& x,
                (6.0 * (x[2] - x0[2]));
     }
   }
-  return u[n] - u0[n] - dt * result;
+  return u[n] - u0[n] + dt * result;
 }
 
 template <typename Metric>
@@ -442,6 +442,14 @@ iterate_newton(Particle<var>& p, const Metric& metric, double dt,
     // Initialize guess solution
     Vec3<var> x(p.x[0], p.x[1], p.x[2]);
     Vec3<var> u(p.u[0], p.u[1], p.u[2]);
+    if (type == SolverType::hamiltonian && i == 0) {
+      x[0] += p.dx[0];
+      x[1] += p.dx[1];
+      x[2] += p.dx[2];
+      u[0] += p.du[0];
+      u[1] += p.du[1];
+      u[2] += p.du[2];
+    }
     x[0].diff(0);
     x[1].diff(1);
     x[2].diff(2);
@@ -484,7 +492,15 @@ iterate_newton(Particle<var>& p, const Metric& metric, double dt,
     p.u[1] -= new_f[4];
     p.u[2] -= new_f[5];
 
-    if (norm(new_f) <= tolerance) break;
+    if (norm(new_f) <= tolerance) {
+      p.dx[0] = p.x[0] - p0.x[0];
+      p.dx[1] = p.x[1] - p0.x[1];
+      p.dx[2] = p.x[2] - p0.x[2];
+      p.du[0] = p.u[0] - p0.u[0];
+      p.du[1] = p.u[1] - p0.u[1];
+      p.du[2] = p.u[2] - p0.u[2];
+      break;
+    }
     // if (i == max_iter - 1) return -1;
   }
   return i;
